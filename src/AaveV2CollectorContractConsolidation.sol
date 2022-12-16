@@ -14,6 +14,7 @@ contract AaveV2CollectorContractConsolidation {
     using SafeERC20 for ERC20;
 
     ERC20 public constant USDC = ERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
+    address public constant ETH_USD_FEED = 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419;
 
     address public constant ARAI = 0xc9BC48c72154ef3e5425641a3c747242112a46AF;
     address public constant AAMPL = 0x1E6bb68Acec8fefBD87D192bE09bb274170a0548;
@@ -40,6 +41,8 @@ contract AaveV2CollectorContractConsolidation {
     error NotEnoughTokens();
     /// Oracle price is 0 or lower
     error InvalidOracleAnswer();
+    /// Need to request more than 0 tokens out
+    error OnlyNonZeroAmount();
     /// Token is not available for swap
     error UnsupportedToken();
 
@@ -47,41 +50,48 @@ contract AaveV2CollectorContractConsolidation {
         uint256 quantity;
         uint48 premium;
         address oracle;
-        uint48 oracleDecimals;
+        bool ethFeedOnly;
     }
 
-    mapping (address => Asset) public assets;
+    mapping(address => Asset) public assets;
 
     constructor() {
-        assets[ARAI] = Asset(6740239e16, 100, 0x483d36F6a1d063d580c7a24F9A42B346f3a69fbb, 8); // Custom Feed 
-        assets[AAMPL] = Asset(15891248e16, 300, 0xe20CA8D7546932360e37E9D72c1a47334af57706, 18); // Monitored Feed
-        assets[AFRAX] = Asset(2869022e16, 75, 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD, 8);
-        assets[FRAX] = Asset(15125e16, 75, 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD, 8);
-        assets[AUST] = Asset(89239797e16, 200, address(0), 0); // NO FEED
-        assets[SUSD] = Asset(9040e16, 75, 0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757, 18); // Only ETH
-        assets[ASUSD] = Asset(1148320e16, 75, 0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757, 18); // Only ETH
-        assets[TUSD] = Asset(160409e16, 75, 0xec746eCF986E2927Abd291a2A1716c940100f8Ba, 8);
-        assets[ATUSD] = Asset(608004e16, 75, 0xec746eCF986E2927Abd291a2A1716c940100f8Ba, 8);
-        assets[AMANA] = Asset(1622740e16, 200, 0x56a4857acbcfe3a66965c251628B1c9f1c408C19, 8);
-        assets[MANA] = Asset(33110e16, 200, 0x56a4857acbcfe3a66965c251628B1c9f1c408C19, 8);
-        assets[ABUSD] = Asset(364085, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, 8);
-        assets[BUSD] = Asset(33991e16, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, 8);
-        assets[ZRX] = Asset(10719e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, 8);
-        assets[AZRX] = Asset(877140e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, 8);
-        assets[ARENFIL] = Asset(41067e16, 300, address(0), 0); // NO FEED
-        assets[AENS] = Asset(7047e16, 300, 0x5C00128d4d1c2F4f652C267d7bcdD7aC99C16E16, 8);
-        assets[ADPI] = Asset(1359e16, 300, 0xD2A593BF7594aCE1faD597adb697b5645d5edDB2, 8); // Monitored Feed
+        assets[ARAI] = Asset(6740239e16, 100, 0x483d36F6a1d063d580c7a24F9A42B346f3a69fbb, false); // Custom Feed
+        assets[AAMPL] = Asset(15891248e16, 300, 0xe20CA8D7546932360e37E9D72c1a47334af57706, false); // Monitored Feed
+        assets[AFRAX] = Asset(2869022e16, 75, 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD, false);
+        assets[FRAX] = Asset(15125e16, 75, 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD, false);
+        assets[AUST] = Asset(89239797e16, 200, address(0), false); // NO FEED
+        assets[SUSD] = Asset(9040e16, 75, 0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757, true); // Only ETH
+        assets[ASUSD] = Asset(1148320e16, 75, 0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757, true); // Only ETH
+        assets[TUSD] = Asset(160409e16, 75, 0xec746eCF986E2927Abd291a2A1716c940100f8Ba, false);
+        assets[ATUSD] = Asset(608004e16, 75, 0xec746eCF986E2927Abd291a2A1716c940100f8Ba, false);
+        assets[AMANA] = Asset(1622740e16, 200, 0x56a4857acbcfe3a66965c251628B1c9f1c408C19, false);
+        assets[MANA] = Asset(33110e16, 200, 0x56a4857acbcfe3a66965c251628B1c9f1c408C19, false);
+        assets[ABUSD] = Asset(364085, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, false);
+        assets[BUSD] = Asset(33991e16, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, false);
+        assets[ZRX] = Asset(10719e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, false);
+        assets[AZRX] = Asset(877140e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, false);
+        assets[ARENFIL] = Asset(41067e16, 300, address(0), false); // NO FEED
+        assets[AENS] = Asset(7047e16, 300, 0x5C00128d4d1c2F4f652C267d7bcdD7aC99C16E16, false);
+        assets[ADPI] = Asset(1359e16, 300, 0xD2A593BF7594aCE1faD597adb697b5645d5edDB2, false); // Monitored Feed
     }
 
+    /// @notice Swaps USDC for specified token
+    /// @param _token the address of the token to swap USDC for
+    /// @param _amountOut the amount of token wanted
+    /// @dev User has to approve USDC transfer prior to calling swap 
     function swap(address _token, uint256 _amountOut) external {
+        if (_amountOut == 0) revert OnlyNonZeroAmount();
+
         ERC20 erc20 = ERC20(_token);
         uint256 amountIn = getAmountIn(_token, _amountOut, erc20.decimals());
 
-        assets[_token].quantity -= _amountOut;
+        uint256 sendAmount = _amountOut == type(uint256).max ? assets[_token].quantity : _amountOut;
+        assets[_token].quantity -= sendAmount;
 
         USDC.safeTransferFrom(msg.sender, AaveV2Ethereum.COLLECTOR, amountIn);
-        erc20.safeTransferFrom(AaveV2Ethereum.COLLECTOR, msg.sender, _amountOut);
-        emit Swap(address(USDC), _token, amountIn, _amountOut);
+        erc20.safeTransferFrom(AaveV2Ethereum.COLLECTOR, msg.sender, sendAmount);
+        emit Swap(address(USDC), _token, amountIn, sendAmount);
     }
 
     /// @notice Returns amount of USDC to be spent to swap for token
@@ -90,30 +100,41 @@ contract AaveV2CollectorContractConsolidation {
     /// @param _decimals decimals of ERC20 token
     /// @return amountInWithDiscount the amount of USDC used minus premium incentive
     /// @dev User check this function before calling swap() to see the amount of USDC required
-    function getAmountIn(address _token, uint256 _amountOut, uint256 _decimals) public view returns (uint256) {
+    function getAmountIn(
+        address _token,
+        uint256 _amountOut,
+        uint256 _decimals
+    ) public view returns (uint256) {
         Asset memory asset = assets[_token];
         if (asset.oracle == address(0)) revert UnsupportedToken();
 
         if (_amountOut == type(uint256).max) {
             _amountOut = asset.quantity;
         } else if (_amountOut > asset.quantity) {
-            console.log('here');
             revert NotEnoughTokens();
         }
 
-        console.log(_amountOut / _decimals);
+        (uint256 oraclePrice, uint8 oracleDecimals) = getOraclePrice(asset.oracle);
+        uint256 exponent = _decimals + oracleDecimals - USDC.decimals();
 
-        uint256 amountIn = (_amountOut / _decimals) / (getOraclePrice(asset.oracle) / asset.oracleDecimals) * USDC.decimals();
+        if (asset.ethFeedOnly) {
+            (uint256 ethUsdPrice, uint8 ethUsdDecimals) = getOraclePrice(ETH_USD_FEED);
+            oraclePrice *= ethUsdPrice;
+            exponent += ethUsdDecimals;
+        }
+
+        uint256 amountIn = _amountOut * oraclePrice / 10**exponent;
+
         // Basis points arbitrage incentive
         return (amountIn * (10000 - asset.premium)) / 10000;
     }
-
+    /// @return (oraclePrice, oracleDecimals) the oracle price and the decimal representation of the price
     /// @notice The peg price of the referenced oracle as USD per unit
-    function getOraclePrice(address _feedAddress) public view returns (uint256) {
+    function getOraclePrice(address _feedAddress) public view returns (uint256, uint8) {
         AggregatorV3Interface feed = AggregatorV3Interface(_feedAddress);
-        
-        (,int256 price,,,) = feed.latestRoundData();
+
+        (, int256 price, , , ) = feed.latestRoundData();
         if (price <= 0) revert InvalidOracleAnswer();
-        return uint256(price);
+        return (uint256(price), feed.decimals());
     }
 }
