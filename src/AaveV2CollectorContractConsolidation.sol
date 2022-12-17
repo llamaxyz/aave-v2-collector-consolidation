@@ -58,11 +58,13 @@ contract AaveV2CollectorContractConsolidation {
     constructor() {
         assets[ARAI] = Asset(6740239e16, 100, 0x483d36F6a1d063d580c7a24F9A42B346f3a69fbb, false); // Custom Feed
         assets[AAMPL] = Asset(15891248e16, 300, 0xe20CA8D7546932360e37E9D72c1a47334af57706, false); // Monitored Feed
-        assets[AFRAX] = Asset(2869022e16, 75, 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD, false);
-        assets[FRAX] = Asset(15125e16, 75, 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD, false);
+        assets[ADPI] = Asset(1359e16, 300, 0xD2A593BF7594aCE1faD597adb697b5645d5edDB2, false); // Monitored Feed
         assets[AUST] = Asset(89239797e16, 200, address(0), false); // NO FEED
+        assets[ARENFIL] = Asset(41067e16, 300, address(0), false); // NO FEED
         assets[SUSD] = Asset(9040e16, 75, 0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757, true); // Only ETH
         assets[ASUSD] = Asset(1148320e16, 75, 0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757, true); // Only ETH
+        assets[AFRAX] = Asset(2869022e16, 75, 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD, false);
+        assets[FRAX] = Asset(15125e16, 75, 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD, false);
         assets[TUSD] = Asset(160409e16, 75, 0xec746eCF986E2927Abd291a2A1716c940100f8Ba, false);
         assets[ATUSD] = Asset(608004e16, 75, 0xec746eCF986E2927Abd291a2A1716c940100f8Ba, false);
         assets[AMANA] = Asset(1622740e16, 200, 0x56a4857acbcfe3a66965c251628B1c9f1c408C19, false);
@@ -71,9 +73,7 @@ contract AaveV2CollectorContractConsolidation {
         assets[BUSD] = Asset(33991e16, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, false);
         assets[ZRX] = Asset(10719e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, false);
         assets[AZRX] = Asset(877140e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, false);
-        assets[ARENFIL] = Asset(41067e16, 300, address(0), false); // NO FEED
         assets[AENS] = Asset(7047e16, 300, 0x5C00128d4d1c2F4f652C267d7bcdD7aC99C16E16, false);
-        assets[ADPI] = Asset(1359e16, 300, 0xD2A593BF7594aCE1faD597adb697b5645d5edDB2, false); // Monitored Feed
     }
 
     /// @notice Swaps USDC for specified token
@@ -133,7 +133,7 @@ contract AaveV2CollectorContractConsolidation {
     function getOraclePrice(address _feedAddress) public view returns (uint256, uint8) {
         AggregatorV3Interface feed = AggregatorV3Interface(_feedAddress);
 
-        (, int256 price, , , ) = feed.latestRoundData();
+        int256 price = feed.latestAnswer();
         if (price <= 0) revert InvalidOracleAnswer();
         return (uint256(price), feed.decimals());
     }
