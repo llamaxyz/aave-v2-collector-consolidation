@@ -102,12 +102,12 @@ contract AaveV2CollectorContractConsolidation {
     /// @notice Returns amount of USDC to be spent to swap for token
     /// @param _token the address of the token to swap
     /// @param _amountOut the amount of token wanted
-    /// @return amountInWithDiscount the amount of USDC used minus premium incentive
+    /// return amountInWithDiscount the amount of USDC used minus premium incentive
     /// @dev User check this function before calling swap() to see the amount of USDC required
     function getAmountIn(
         address _token,
         uint256 _amountOut
-    ) public view returns (uint256) {
+    ) public view returns (uint256 amountIn) {
         Asset memory asset = assets[_token];
         if (asset.oracle == address(0)) revert UnsupportedToken();
 
@@ -118,18 +118,19 @@ contract AaveV2CollectorContractConsolidation {
         }
 
         uint256 oraclePrice = getOraclePrice(asset.oracle);
-        uint256 exponent = asset.decimals + asset.oracleDecimals - USDC_DECIMALS;
+        unchecked {
+            uint256 exponent = asset.decimals + asset.oracleDecimals - USDC_DECIMALS;
 
-        if (asset.ethFeedOnly) {
-            uint256 ethUsdPrice = getOraclePrice(ETH_USD_FEED);
-            oraclePrice *= ethUsdPrice;
-            exponent += ETH_USD_ORACLE_DECIMALS;
+            if (asset.ethFeedOnly) {
+                uint256 ethUsdPrice = getOraclePrice(ETH_USD_FEED);
+                oraclePrice *= ethUsdPrice;
+                exponent += ETH_USD_ORACLE_DECIMALS;
+            }
+
+            // Basis points arbitrage incentive
+            amountIn = ((_amountOut * oraclePrice / 10**exponent) // Amount in before discount 
+                * (10000 - asset.premium)) / 10000;
         }
-
-        uint256 amountIn = _amountOut * oraclePrice / 10**exponent;
-
-        // Basis points arbitrage incentive
-        return (amountIn * (10000 - asset.premium)) / 10000;
     }
     /// @return The oracle price
     /// @notice The peg price of the referenced oracle as USD per unit
