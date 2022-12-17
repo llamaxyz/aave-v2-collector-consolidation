@@ -97,7 +97,7 @@ contract AaveV2CollectorContractConsolidation {
             assets[_token].quantity = quantity - sendAmount;
         }
 
-        USDC.safeTransferFrom(msg.sender, AaveV2Ethereum.COLLECTOR, amountIn);
+        USDC.transferFrom(msg.sender, AaveV2Ethereum.COLLECTOR, amountIn);
         ERC20(_token).safeTransferFrom(AaveV2Ethereum.COLLECTOR, msg.sender, sendAmount);
         emit Swap(address(USDC), _token, amountIn, sendAmount);
     }
