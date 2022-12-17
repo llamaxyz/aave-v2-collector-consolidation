@@ -13,6 +13,7 @@ import "@forge-std/console.sol";
 contract AaveV2CollectorContractConsolidation {
     using SafeERC20 for ERC20;
 
+    uint256 public immutable USDC_DECIMALS;
     ERC20 public constant USDC = ERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
     address public constant ETH_USD_FEED = 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419;
 
@@ -74,6 +75,7 @@ contract AaveV2CollectorContractConsolidation {
         assets[ZRX] = Asset(10719e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, false);
         assets[AZRX] = Asset(877140e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, false);
         assets[AENS] = Asset(7047e16, 300, 0x5C00128d4d1c2F4f652C267d7bcdD7aC99C16E16, false);
+        USDC_DECIMALS = USDC.decimals();
     }
 
     /// @notice Swaps USDC for specified token
@@ -115,7 +117,7 @@ contract AaveV2CollectorContractConsolidation {
         }
 
         (uint256 oraclePrice, uint8 oracleDecimals) = getOraclePrice(asset.oracle);
-        uint256 exponent = _decimals + oracleDecimals - USDC.decimals();
+        uint256 exponent = _decimals + oracleDecimals - USDC_DECIMALS;
 
         if (asset.ethFeedOnly) {
             (uint256 ethUsdPrice, uint8 ethUsdDecimals) = getOraclePrice(ETH_USD_FEED);
