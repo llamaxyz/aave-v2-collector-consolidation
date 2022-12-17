@@ -73,7 +73,7 @@ contract AaveV2CollectorContractConsolidation {
         assets[ATUSD] = Asset(608004e16, 75, 0xec746eCF986E2927Abd291a2A1716c940100f8Ba, ERC20(ATUSD).decimals(), 8, false);
         assets[AMANA] = Asset(1622740e16, 200, 0x56a4857acbcfe3a66965c251628B1c9f1c408C19, ERC20(AMANA).decimals(), 8, false);
         assets[MANA] = Asset(33110e16, 200, 0x56a4857acbcfe3a66965c251628B1c9f1c408C19, ERC20(MANA).decimals(), 8, false);
-        assets[ABUSD] = Asset(364085, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, ERC20(ABUSD).decimals(), 8, false);
+        assets[ABUSD] = Asset(364085e16, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, ERC20(ABUSD).decimals(), 8, false);
         assets[BUSD] = Asset(33991e16, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, ERC20(BUSD).decimals(), 8, false);
         assets[ZRX] = Asset(10719e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, ERC20(ZRX).decimals(), 8, false);
         assets[AZRX] = Asset(877140e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, ERC20(AZRX).decimals(), 8, false);
