@@ -90,9 +90,12 @@ contract AaveV2CollectorContractConsolidation {
         if (_amountOut == 0) revert OnlyNonZeroAmount();
 
         uint256 amountIn = getAmountIn(_token, _amountOut);
+        uint256 quantity = assets[_token].quantity;
+        uint256 sendAmount = _amountOut == type(uint256).max ? quantity : _amountOut;
 
-        uint256 sendAmount = _amountOut == type(uint256).max ? assets[_token].quantity : _amountOut;
-        assets[_token].quantity -= sendAmount;
+        unchecked {
+            assets[_token].quantity = quantity - sendAmount;
+        }
 
         USDC.safeTransferFrom(msg.sender, AaveV2Ethereum.COLLECTOR, amountIn);
         ERC20(_token).safeTransferFrom(AaveV2Ethereum.COLLECTOR, msg.sender, sendAmount);
