@@ -57,23 +57,23 @@ contract AaveV2CollectorContractConsolidation {
 
     constructor() {
         assets[ARAI] = Asset(6740239e16, 100, 0x483d36F6a1d063d580c7a24F9A42B346f3a69fbb, false); // Custom Feed
-        assets[AAMPL] = Asset(15891248e16, 300, 0xe20CA8D7546932360e37E9D72c1a47334af57706, false); // Monitored Feed
+        assets[AAMPL] = Asset(15891248e7, 300, 0xe20CA8D7546932360e37E9D72c1a47334af57706, false); // Monitored Feed
         assets[AFRAX] = Asset(2869022e16, 75, 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD, false);
-        assets[FRAX] = Asset(15125e16, 75, 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD, false);
-        assets[AUST] = Asset(89239797e16, 200, address(0), false); // NO FEED
+        assets[FRAX] = Asset(1512479102e11, 75, 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD, false);
+        assets[AENS] = Asset(7047e16, 300, 0x5C00128d4d1c2F4f652C267d7bcdD7aC99C16E16, false);
         assets[SUSD] = Asset(9040e16, 75, 0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757, true); // Only ETH
         assets[ASUSD] = Asset(1148320e16, 75, 0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757, true); // Only ETH
         assets[TUSD] = Asset(160409e16, 75, 0xec746eCF986E2927Abd291a2A1716c940100f8Ba, false);
         assets[ATUSD] = Asset(608004e16, 75, 0xec746eCF986E2927Abd291a2A1716c940100f8Ba, false);
         assets[AMANA] = Asset(1622740e16, 200, 0x56a4857acbcfe3a66965c251628B1c9f1c408C19, false);
         assets[MANA] = Asset(33110e16, 200, 0x56a4857acbcfe3a66965c251628B1c9f1c408C19, false);
-        assets[ABUSD] = Asset(364085, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, false);
-        assets[BUSD] = Asset(33991e16, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, false);
+        assets[ADPI] = Asset(1359e16, 300, 0xD2A593BF7594aCE1faD597adb697b5645d5edDB2, false); 
+        assets[ABUSD] = Asset(364085e16, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, false);
+        assets[BUSD] = Asset(3399064e14, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, false);
         assets[ZRX] = Asset(10719e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, false);
         assets[AZRX] = Asset(877140e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, false);
+        assets[AUST] = Asset(89239797e4, 200, address(0), false); // NO FEED
         assets[ARENFIL] = Asset(41067e16, 300, address(0), false); // NO FEED
-        assets[AENS] = Asset(7047e16, 300, 0x5C00128d4d1c2F4f652C267d7bcdD7aC99C16E16, false);
-        assets[ADPI] = Asset(1359e16, 300, 0xD2A593BF7594aCE1faD597adb697b5645d5edDB2, false); // Monitored Feed
     }
 
     /// @notice Swaps USDC for specified token
@@ -83,14 +83,17 @@ contract AaveV2CollectorContractConsolidation {
     function swap(address _token, uint256 _amountOut) external {
         if (_amountOut == 0) revert OnlyNonZeroAmount();
 
-        ERC20 erc20 = ERC20(_token);
-        uint256 amountIn = getAmountIn(_token, _amountOut, erc20.decimals());
+        uint256 amountIn = getAmountIn(_token, _amountOut, ERC20(_token).decimals());
 
-        uint256 sendAmount = _amountOut == type(uint256).max ? assets[_token].quantity : _amountOut;
-        assets[_token].quantity -= sendAmount;
+        uint256 quantity = assets[_token].quantity;
+        uint256 sendAmount = _amountOut == type(uint256).max ? quantity : _amountOut;
 
-        USDC.safeTransferFrom(msg.sender, AaveV2Ethereum.COLLECTOR, amountIn);
-        erc20.safeTransferFrom(AaveV2Ethereum.COLLECTOR, msg.sender, sendAmount);
+        unchecked {
+            assets[_token].quantity = quantity - sendAmount;
+        }
+
+        USDC.transferFrom(msg.sender, AaveV2Ethereum.COLLECTOR, amountIn);
+        ERC20(_token).safeTransferFrom(AaveV2Ethereum.COLLECTOR, msg.sender, sendAmount);
         emit Swap(address(USDC), _token, amountIn, sendAmount);
     }
 
@@ -98,13 +101,13 @@ contract AaveV2CollectorContractConsolidation {
     /// @param _token the address of the token to swap
     /// @param _amountOut the amount of token wanted
     /// @param _decimals decimals of ERC20 token
-    /// @return amountInWithDiscount the amount of USDC used minus premium incentive
+    /// return amountInWithDiscount the amount of USDC used minus premium incentive
     /// @dev User check this function before calling swap() to see the amount of USDC required
     function getAmountIn(
         address _token,
         uint256 _amountOut,
         uint256 _decimals
-    ) public view returns (uint256) {
+    ) public view returns (uint256 amountIn) {
         Asset memory asset = assets[_token];
         if (asset.oracle == address(0)) revert UnsupportedToken();
 
@@ -115,20 +118,21 @@ contract AaveV2CollectorContractConsolidation {
         }
 
         (uint256 oraclePrice, uint8 oracleDecimals) = getOraclePrice(asset.oracle);
-        uint256 exponent = _decimals + oracleDecimals - USDC.decimals();
+        unchecked {
+            uint256 exponent = _decimals + oracleDecimals - USDC.decimals();
 
-        if (asset.ethFeedOnly) {
-            (uint256 ethUsdPrice, uint8 ethUsdDecimals) = getOraclePrice(ETH_USD_FEED);
-            oraclePrice *= ethUsdPrice;
-            exponent += ethUsdDecimals;
+            if (asset.ethFeedOnly) {
+                (uint256 ethUsdPrice, uint8 ethUsdDecimals) = getOraclePrice(ETH_USD_FEED);
+                oraclePrice *= ethUsdPrice;
+                exponent += ethUsdDecimals;
+            }
+
+            // Basis points arbitrage incentive
+            amountIn = ((_amountOut * oraclePrice / 10**exponent) // Amount in before discount 
+                * (10000 - asset.premium)) / 10000;
         }
-
-        uint256 amountIn = _amountOut * oraclePrice / 10**exponent;
-
-        // Basis points arbitrage incentive
-        return (amountIn * (10000 - asset.premium)) / 10000;
     }
-    /// @return (oraclePrice, oracleDecimals) the oracle price and the decimal representation of the price
+    /// return (oraclePrice, oracleDecimals) the oracle price and the decimal representation of the price
     /// @notice The peg price of the referenced oracle as USD per unit
     function getOraclePrice(address _feedAddress) public view returns (uint256, uint8) {
         AggregatorV3Interface feed = AggregatorV3Interface(_feedAddress);
