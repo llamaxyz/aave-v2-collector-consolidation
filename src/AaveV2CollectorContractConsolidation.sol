@@ -61,20 +61,20 @@ contract AaveV2CollectorContractConsolidation {
 
     constructor() {
         assets[ARAI] = Asset(6740239e16, 100, 0x483d36F6a1d063d580c7a24F9A42B346f3a69fbb, ERC20(ARAI).decimals(), 8, false); // Custom Feed
-        assets[AAMPL] = Asset(15891248e16, 300, 0xe20CA8D7546932360e37E9D72c1a47334af57706, ERC20(AAMPL).decimals(), 18, false); // Monitored Feed
+        assets[AAMPL] = Asset(15891248e7, 300, 0xe20CA8D7546932360e37E9D72c1a47334af57706, ERC20(AAMPL).decimals(), 18, false); // Monitored Feed
         assets[ADPI] = Asset(1359e16, 300, 0xD2A593BF7594aCE1faD597adb697b5645d5edDB2, ERC20(ADPI).decimals(), 8, false); // Monitored Feed
-        assets[AUST] = Asset(89239797e16, 200, address(0), ERC20(AUST).decimals(), 0, false); // NO FEED
+        assets[AUST] = Asset(89239797e4, 200, address(0), ERC20(AUST).decimals(), 0, false); // NO FEED
         assets[ARENFIL] = Asset(41067e16, 300, address(0), ERC20(ARENFIL).decimals(), 0, false); // NO FEED
         assets[SUSD] = Asset(9040e16, 75, 0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757, ERC20(SUSD).decimals(), 18, true); // Only ETH
         assets[ASUSD] = Asset(1148320e16, 75, 0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757, ERC20(ASUSD).decimals(), 18, true); // Only ETH
         assets[AFRAX] = Asset(2869022e16, 75, 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD, ERC20(AFRAX).decimals(), 8, false);
-        assets[FRAX] = Asset(15125e16, 75, 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD, ERC20(FRAX).decimals(), 8, false);
+        assets[FRAX] = Asset(1512479102e11, 75, 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD, ERC20(FRAX).decimals(), 8, false);
         assets[TUSD] = Asset(160409e16, 75, 0xec746eCF986E2927Abd291a2A1716c940100f8Ba, ERC20(TUSD).decimals(), 8, false);
         assets[ATUSD] = Asset(608004e16, 75, 0xec746eCF986E2927Abd291a2A1716c940100f8Ba, ERC20(ATUSD).decimals(), 8, false);
         assets[AMANA] = Asset(1622740e16, 200, 0x56a4857acbcfe3a66965c251628B1c9f1c408C19, ERC20(AMANA).decimals(), 8, false);
         assets[MANA] = Asset(33110e16, 200, 0x56a4857acbcfe3a66965c251628B1c9f1c408C19, ERC20(MANA).decimals(), 8, false);
         assets[ABUSD] = Asset(364085e16, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, ERC20(ABUSD).decimals(), 8, false);
-        assets[BUSD] = Asset(33991e16, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, ERC20(BUSD).decimals(), 8, false);
+        assets[BUSD] = Asset(3399064e14, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, ERC20(BUSD).decimals(), 8, false);
         assets[ZRX] = Asset(10719e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, ERC20(ZRX).decimals(), 8, false);
         assets[AZRX] = Asset(877140e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, ERC20(AZRX).decimals(), 8, false);
         assets[AENS] = Asset(7047e16, 300, 0x5C00128d4d1c2F4f652C267d7bcdD7aC99C16E16, ERC20(AENS).decimals(), 8, false);
@@ -139,7 +139,7 @@ contract AaveV2CollectorContractConsolidation {
     /// @return The oracle price
     /// @notice The peg price of the referenced oracle as USD per unit
     function getOraclePrice(address _feedAddress) public view returns (uint256) {
-        int256 price = AggregatorV3Interface(_feedAddress).latestAnswer();
+        (, int256 price, , , ) = AggregatorV3Interface(_feedAddress).latestRoundData();
         if (price <= 0) revert InvalidOracleAnswer();
         return uint256(price);
     }
