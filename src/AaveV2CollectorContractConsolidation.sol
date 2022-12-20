@@ -105,6 +105,7 @@ contract AaveV2CollectorContractConsolidation {
     /// @notice Returns amount of USDC to be spent to swap for token
     /// @param _token the address of the token to swap
     /// @param _amountOut the amount of token wanted
+    /// @param _decimals decimals of ERC20 token
     /// return amountInWithDiscount the amount of USDC used minus premium incentive
     /// @dev User check this function before calling swap() to see the amount of USDC required
     function getAmountIn(
