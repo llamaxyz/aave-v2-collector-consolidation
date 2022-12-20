@@ -15,6 +15,7 @@ contract AaveV2CollectorContractConsolidation {
 
     uint256 public immutable USDC_DECIMALS;
     uint256 public immutable ETH_USD_ORACLE_DECIMALS;
+
     ERC20 public constant USDC = ERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
     address public constant ETH_USD_FEED = 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419;
 
@@ -33,7 +34,6 @@ contract AaveV2CollectorContractConsolidation {
     address public constant BUSD = 0x4Fabb145d64652a948d72533023f6E7A623C7C53;
     address public constant ZRX = 0xE41d2489571d322189246DaFA5ebDe1F4699F498;
     address public constant AZRX = 0xDf7FF54aAcAcbFf42dfe29DD6144A69b629f8C9e;
-    address public constant ARENFIL = 0x514cd6756CCBe28772d4Cb81bC3156BA9d1744aa;
     address public constant AENS = 0x9a14e23A58edf4EFDcB360f68cd1b95ce2081a2F;
     address public constant ADPI = 0x6F634c6135D2EBD550000ac92F494F9CB8183dAe;
 
@@ -60,24 +60,129 @@ contract AaveV2CollectorContractConsolidation {
     mapping(address => Asset) public assets;
 
     constructor() {
-        assets[ARAI] = Asset(6740239e16, 100, 0x483d36F6a1d063d580c7a24F9A42B346f3a69fbb, ERC20(ARAI).decimals(), 8, false); // Custom Feed
-        assets[AAMPL] = Asset(15891248e7, 300, 0xe20CA8D7546932360e37E9D72c1a47334af57706, ERC20(AAMPL).decimals(), 18, false); // Monitored Feed
-        assets[ADPI] = Asset(1359e16, 300, 0xD2A593BF7594aCE1faD597adb697b5645d5edDB2, ERC20(ADPI).decimals(), 8, false); // Monitored Feed
-        assets[AUST] = Asset(89239797e4, 200, address(0), ERC20(AUST).decimals(), 0, false); // NO FEED
-        assets[ARENFIL] = Asset(41067e16, 300, address(0), ERC20(ARENFIL).decimals(), 0, false); // NO FEED
-        assets[SUSD] = Asset(9040e16, 75, 0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757, ERC20(SUSD).decimals(), 18, true); // Only ETH
-        assets[ASUSD] = Asset(1148320e16, 75, 0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757, ERC20(ASUSD).decimals(), 18, true); // Only ETH
-        assets[AFRAX] = Asset(2869022e16, 75, 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD, ERC20(AFRAX).decimals(), 8, false);
-        assets[FRAX] = Asset(1512479102e11, 75, 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD, ERC20(FRAX).decimals(), 8, false);
-        assets[TUSD] = Asset(160409e16, 75, 0xec746eCF986E2927Abd291a2A1716c940100f8Ba, ERC20(TUSD).decimals(), 8, false);
-        assets[ATUSD] = Asset(608004e16, 75, 0xec746eCF986E2927Abd291a2A1716c940100f8Ba, ERC20(ATUSD).decimals(), 8, false);
-        assets[AMANA] = Asset(1622740e16, 200, 0x56a4857acbcfe3a66965c251628B1c9f1c408C19, ERC20(AMANA).decimals(), 8, false);
-        assets[MANA] = Asset(33110e16, 200, 0x56a4857acbcfe3a66965c251628B1c9f1c408C19, ERC20(MANA).decimals(), 8, false);
-        assets[ABUSD] = Asset(364085e16, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, ERC20(ABUSD).decimals(), 8, false);
-        assets[BUSD] = Asset(3399064e14, 75, 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A, ERC20(BUSD).decimals(), 8, false);
+        assets[ARAI] = Asset(
+            6740239e16,
+            100,
+            0x483d36F6a1d063d580c7a24F9A42B346f3a69fbb,
+            ERC20(ARAI).decimals(),
+            8,
+            false
+        );
+        assets[AAMPL] = Asset(
+            15891248e7,
+            300,
+            0xe20CA8D7546932360e37E9D72c1a47334af57706,
+            ERC20(AAMPL).decimals(),
+            18,
+            false
+        );
+        assets[ADPI] = Asset(
+            1359e16,
+            300,
+            0xD2A593BF7594aCE1faD597adb697b5645d5edDB2,
+            ERC20(ADPI).decimals(),
+            8,
+            false
+        );
+        assets[SUSD] = Asset(9040e16, 75, 0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757, ERC20(SUSD).decimals(), 18, true);
+        assets[ASUSD] = Asset(
+            1148320e16,
+            75,
+            0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757,
+            ERC20(ASUSD).decimals(),
+            18,
+            true
+        );
+        assets[AFRAX] = Asset(
+            2869022e16,
+            75,
+            0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD,
+            ERC20(AFRAX).decimals(),
+            8,
+            false
+        );
+        assets[FRAX] = Asset(
+            1512479102e11,
+            75,
+            0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD,
+            ERC20(FRAX).decimals(),
+            8,
+            false
+        );
+        assets[TUSD] = Asset(
+            160409e16,
+            75,
+            0xec746eCF986E2927Abd291a2A1716c940100f8Ba,
+            ERC20(TUSD).decimals(),
+            8,
+            false
+        );
+        assets[ATUSD] = Asset(
+            608004e16,
+            75,
+            0xec746eCF986E2927Abd291a2A1716c940100f8Ba,
+            ERC20(ATUSD).decimals(),
+            8,
+            false
+        );
+        assets[AMANA] = Asset(
+            1622740e16,
+            200,
+            0x56a4857acbcfe3a66965c251628B1c9f1c408C19,
+            ERC20(AMANA).decimals(),
+            8,
+            false
+        );
+        assets[MANA] = Asset(
+            33110e16,
+            200,
+            0x56a4857acbcfe3a66965c251628B1c9f1c408C19,
+            ERC20(MANA).decimals(),
+            8,
+            false
+        );
+        assets[ABUSD] = Asset(
+            364085e16,
+            75,
+            0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A,
+            ERC20(ABUSD).decimals(),
+            8,
+            false
+        );
+        assets[BUSD] = Asset(
+            3399064e14,
+            75,
+            0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A,
+            ERC20(BUSD).decimals(),
+            8,
+            false
+        );
         assets[ZRX] = Asset(10719e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, ERC20(ZRX).decimals(), 8, false);
-        assets[AZRX] = Asset(877140e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, ERC20(AZRX).decimals(), 8, false);
-        assets[AENS] = Asset(7047e16, 300, 0x5C00128d4d1c2F4f652C267d7bcdD7aC99C16E16, ERC20(AENS).decimals(), 8, false);
+        assets[AZRX] = Asset(
+            877140e16,
+            300,
+            0x2885d15b8Af22648b98B122b22FDF4D2a56c6023,
+            ERC20(AZRX).decimals(),
+            8,
+            false
+        );
+        assets[AENS] = Asset(
+            7047e16,
+            300,
+            0x5C00128d4d1c2F4f652C267d7bcdD7aC99C16E16,
+            ERC20(AENS).decimals(),
+            8,
+            false
+        );
+        assets[AUST] = Asset(
+            89239797e4,
+            200,
+            0xa20623070413d42a5C01Db2c8111640DD7A5A03a,
+            ERC20(AUST).decimals(),
+            18,
+            false
+        );
+
         USDC_DECIMALS = USDC.decimals();
         ETH_USD_ORACLE_DECIMALS = AggregatorV3Interface(ETH_USD_FEED).decimals();
     }
@@ -85,7 +190,7 @@ contract AaveV2CollectorContractConsolidation {
     /// @notice Swaps USDC for specified token
     /// @param _token the address of the token to swap USDC for
     /// @param _amountOut the amount of token wanted
-    /// @dev User has to approve USDC transfer prior to calling swap 
+    /// @dev User has to approve USDC transfer prior to calling swap
     function swap(address _token, uint256 _amountOut) external {
         if (_amountOut == 0) revert OnlyNonZeroAmount();
 
@@ -93,9 +198,7 @@ contract AaveV2CollectorContractConsolidation {
         uint256 quantity = assets[_token].quantity;
         uint256 sendAmount = _amountOut == type(uint256).max ? quantity : _amountOut;
 
-        unchecked {
-            assets[_token].quantity = quantity - sendAmount;
-        }
+        assets[_token].quantity = quantity - sendAmount;
 
         USDC.transferFrom(msg.sender, AaveV2Ethereum.COLLECTOR, amountIn);
         ERC20(_token).safeTransferFrom(AaveV2Ethereum.COLLECTOR, msg.sender, sendAmount);
@@ -105,13 +208,9 @@ contract AaveV2CollectorContractConsolidation {
     /// @notice Returns amount of USDC to be spent to swap for token
     /// @param _token the address of the token to swap
     /// @param _amountOut the amount of token wanted
-    /// @param _decimals decimals of ERC20 token
     /// return amountInWithDiscount the amount of USDC used minus premium incentive
     /// @dev User check this function before calling swap() to see the amount of USDC required
-    function getAmountIn(
-        address _token,
-        uint256 _amountOut
-    ) public view returns (uint256 amountIn) {
+    function getAmountIn(address _token, uint256 _amountOut) public view returns (uint256 amountIn) {
         Asset memory asset = assets[_token];
         if (asset.oracle == address(0)) revert UnsupportedToken();
 
@@ -122,20 +221,20 @@ contract AaveV2CollectorContractConsolidation {
         }
 
         uint256 oraclePrice = getOraclePrice(asset.oracle);
-        unchecked {
-            uint256 exponent = asset.decimals + asset.oracleDecimals - USDC_DECIMALS;
+        uint256 exponent = asset.decimals + asset.oracleDecimals - USDC_DECIMALS;
 
-            if (asset.ethFeedOnly) {
-                uint256 ethUsdPrice = getOraclePrice(ETH_USD_FEED);
-                oraclePrice *= ethUsdPrice;
-                exponent += ETH_USD_ORACLE_DECIMALS;
-            }
-
-            // Basis points arbitrage incentive
-            amountIn = ((_amountOut * oraclePrice / 10**exponent) // Amount in before discount 
-                * (10000 - asset.premium)) / 10000;
+        if (asset.ethFeedOnly) {
+            uint256 ethUsdPrice = getOraclePrice(ETH_USD_FEED);
+            oraclePrice *= ethUsdPrice;
+            exponent += ETH_USD_ORACLE_DECIMALS;
         }
+
+        // Basis points arbitrage incentive
+        amountIn =
+            (((_amountOut * oraclePrice) / 10**exponent) * (10000 - asset.premium)) / // Amount in before discount
+            10000;
     }
+
     /// @return The oracle price
     /// @notice The peg price of the referenced oracle as USD per unit
     function getOraclePrice(address _feedAddress) public view returns (uint256) {

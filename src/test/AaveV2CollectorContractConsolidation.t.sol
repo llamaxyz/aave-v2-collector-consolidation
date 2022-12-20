@@ -19,7 +19,7 @@ contract AaveV2CollectorContractConsolidationTest is Test {
 
     AaveV2CollectorContractConsolidation public collectorContract;
 
-    address[18] public allTokens;
+    address[17] public allTokens;
 
     function setUp() public {
         vm.createSelectFork(vm.rpcUrl("mainnet"), 16183428); // December 14, 2022
@@ -40,9 +40,8 @@ contract AaveV2CollectorContractConsolidationTest is Test {
         allTokens[12] = collectorContract.BUSD();
         allTokens[13] = collectorContract.ZRX();
         allTokens[14] = collectorContract.AZRX();
-        allTokens[15] = collectorContract.MANA(); // Up to here tests
-        allTokens[16] = collectorContract.AUST();
-        allTokens[17] = collectorContract.ARENFIL();
+        allTokens[15] = collectorContract.AUST();
+        allTokens[16] = collectorContract.MANA(); // Up to here tests
     }
 
     function testSwapZeroAmount() public {
@@ -51,72 +50,19 @@ contract AaveV2CollectorContractConsolidationTest is Test {
         collectorContract.swap(frax, 0);
     }
 
-    function testSwapAllAAmpl() public {
-        address aampl = collectorContract.AAMPL();
-        (uint256 initialQty, , , ) = collectorContract.assets(aampl);
-
-        vm.prank(AaveV2Ethereum.COLLECTOR);
-        ERC20(aampl).approve(address(collectorContract), 100_000e18);
-        vm.stopPrank();
-
-        vm.prank(USDC_WHALE);
-        USDC.approve(address(collectorContract), 100_000e18);
-        vm.stopPrank();
-
-        vm.prank(USDC_WHALE);
-        vm.expectEmit(true, true, false, true);
-        emit Swap(address(USDC), aampl, 200388637280, initialQty);
-        collectorContract.swap(aampl, type(uint256).max);
-
-        (uint256 endQty, , , ) = collectorContract.assets(aampl);
-        assertEq(endQty, 0);
+    function testSwapInvalidToken() public {
+        vm.expectRevert(AaveV2CollectorContractConsolidation.UnsupportedToken.selector);
+        collectorContract.swap(WETH, 1e18);
     }
 
-    function testSwapAllFrax() public {
-        address frax = collectorContract.FRAX();
-        (uint256 initialQty, , , ) = collectorContract.assets(frax);
-
-        vm.prank(AaveV2Ethereum.COLLECTOR);
-        ERC20(frax).approve(address(collectorContract), 100_000e18);
-        vm.stopPrank();
-
-        vm.prank(USDC_WHALE);
-        USDC.approve(address(collectorContract), 100_000e18);
-        vm.stopPrank();
-
-        vm.prank(USDC_WHALE);
-        vm.expectEmit(true, true, false, true);
-        emit Swap(address(USDC), frax, 149929397, initialQty);
-        collectorContract.swap(frax, type(uint256).max);
-
-        (uint256 endQty, , , ) = collectorContract.assets(frax);
-        assertEq(endQty, 0);
-    }
-
-    function testSwapAllAMana() public {
-        address amana = collectorContract.AMANA();
-        (uint256 initialQty, , , , , ) = collectorContract.assets(amana);
-
-        vm.prank(AaveV2Ethereum.COLLECTOR);
-        ERC20(amana).approve(address(collectorContract), 100_000e18);
-        vm.stopPrank();
-
-        vm.prank(USDC_WHALE);
-        USDC.approve(address(collectorContract), 100_000e18);
-        vm.stopPrank();
-
-        vm.prank(USDC_WHALE);
-        vm.expectEmit(true, true, false, true);
-        emit Swap(address(USDC), amana, 6186477231, initialQty);
-        collectorContract.swap(amana, type(uint256).max);
-
-        (uint256 endQty, , , , , ) = collectorContract.assets(amana);
-        assertEq(endQty, 0);
+    function testSwapTooManyTokens() public {
+        vm.expectRevert(AaveV2CollectorContractConsolidation.NotEnoughTokens.selector);
+        collectorContract.swap(allTokens[0], 500_00e18);
     }
 
     function testSwapAllMana() public {
         address mana = collectorContract.MANA();
-        (uint256 initialQty, , , ) = collectorContract.assets(mana);
+        (uint256 initialQty, , , , , ) = collectorContract.assets(mana);
 
         vm.prank(AaveV2Ethereum.COLLECTOR);
         ERC20(mana).approve(address(collectorContract), 100_000e18);
@@ -131,29 +77,33 @@ contract AaveV2CollectorContractConsolidationTest is Test {
         emit Swap(address(USDC), mana, 6186477231, initialQty);
         collectorContract.swap(mana, type(uint256).max);
 
-        (uint256 endQty, , , ) = collectorContract.assets(mana);
+        (uint256 endQty, , , , , ) = collectorContract.assets(mana);
         assertEq(endQty, 0);
     }
 
-    function testSwapAllBUSD() public {
-        address busd = collectorContract.BUSD();
-        (uint256 initialQty, , , ) = collectorContract.assets(busd);
-
-        vm.prank(AaveV2Ethereum.COLLECTOR);
-        ERC20(busd).approve(address(collectorContract), 100_000e18);
-        vm.stopPrank();
-
+    function testSwapAmountOfTokensOut() public {
         vm.prank(USDC_WHALE);
         USDC.approve(address(collectorContract), 100_000e18);
         vm.stopPrank();
 
-        vm.prank(USDC_WHALE);
-        vm.expectEmit(true, true, false, true);
-        emit Swap(address(USDC), busd, 337317495, initialQty);
-        collectorContract.swap(busd, type(uint256).max);
+        uint256 length = allTokens.length;
+        uint256 amountToWithdraw = 1e18;
+        for (uint256 i = 0; i < length; i++) {
+            address token = allTokens[i];
+            (uint256 initialQty, , , , , ) = collectorContract.assets(token);
 
-        (uint256 endQty, , , ) = collectorContract.assets(busd);
-        assertEq(endQty, 0);
+            vm.prank(AaveV2Ethereum.COLLECTOR);
+            ERC20(token).approve(address(collectorContract), initialQty);
+            vm.stopPrank();
+
+            vm.prank(USDC_WHALE);
+            collectorContract.swap(token, amountToWithdraw);
+            console.log(ERC20(token).name());
+            console.log(token);
+
+            (uint256 endQty, , , , , ) = collectorContract.assets(token);
+            assertEq(endQty, initialQty - amountToWithdraw);
+        }
     }
 
     function testSwapAllTokensOut() public {
@@ -164,7 +114,7 @@ contract AaveV2CollectorContractConsolidationTest is Test {
         uint256 length = allTokens.length;
         for (uint256 i = 0; i < length; i++) {
             address token = allTokens[i];
-            (uint256 initialQty, , , ) = collectorContract.assets(token);
+            (uint256 initialQty, , , , , ) = collectorContract.assets(token);
 
             vm.prank(AaveV2Ethereum.COLLECTOR);
             ERC20(token).approve(address(collectorContract), initialQty);
@@ -175,7 +125,7 @@ contract AaveV2CollectorContractConsolidationTest is Test {
             console.log(ERC20(token).name());
             console.log(token);
 
-            (uint256 endQty, , , ) = collectorContract.assets(token);
+            (uint256 endQty, , , , , ) = collectorContract.assets(token);
             assertEq(endQty, 0);
         }
     }
@@ -195,18 +145,18 @@ contract AaveV2CollectorContractConsolidationTest is Test {
     }
 
     function testGetAmountInAllBUSD() public {
-        // Get out max amount of BUSD from contract (339910000 in USDC terms)
-        uint256 amountOut = 2 ** 256 - 1;
+        // Get out max amount of BUSD from contract (339.910000 in USDC terms)
+        uint256 amountOut = 2**256 - 1;
         uint256 result = collectorContract.getAmountIn(collectorContract.BUSD(), amountOut);
         // BUSD to USDC should be close to 1:1 in price, thus result should be very close, minus discount
-        assertEq(result, 337321068);
+        assertEq(result, 337317495);
     }
 
     function testGetAmountInAllaSUSDWithETHBasedFeed() public {
-        // Get out max amount of BUSD from contract (339910000 in USDC terms)
-        uint256 amountOut = 2 ** 256 - 1;
+        // Get out max amount of aUSD from contract (11,483.0000000 in USDC terms)
+        uint256 amountOut = 2**256 - 1;
         uint256 result = collectorContract.getAmountIn(collectorContract.ASUSD(), amountOut);
-        // BUSD to USDC should be close to 1:1 in price, thus result should be very close, minus discount
+        // aUSD to USDC should be close to 1:1 in price, thus result should be very close, minus discount
         assertEq(result, 11477301463);
     }
 
@@ -234,7 +184,7 @@ contract AaveV2CollectorContractConsolidationTest is Test {
         (, , address oracle, , , ) = collectorContract.assets(collectorContract.ARAI());
         AggregatorV3Interface feed = AggregatorV3Interface(oracle);
 
-        vm.mockCall(address(oracle), abi.encodeWithSelector(feed.latestAnswer.selector), abi.encode(price));
+        vm.mockCall(address(oracle), abi.encodeWithSelector(feed.latestRoundData.selector), abi.encode(price));
 
         vm.expectRevert(AaveV2CollectorContractConsolidation.InvalidOracleAnswer.selector);
         collectorContract.getOraclePrice(oracle);
