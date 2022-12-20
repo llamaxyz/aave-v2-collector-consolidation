@@ -95,7 +95,7 @@ contract AaveV2CollectorContractConsolidationTest is Test {
 
     function testSwapAllAMana() public {
         address amana = collectorContract.AMANA();
-        (uint256 initialQty, , , ) = collectorContract.assets(amana);
+        (uint256 initialQty, , , , , ) = collectorContract.assets(amana);
 
         vm.prank(AaveV2Ethereum.COLLECTOR);
         ERC20(amana).approve(address(collectorContract), 100_000e18);
@@ -110,7 +110,7 @@ contract AaveV2CollectorContractConsolidationTest is Test {
         emit Swap(address(USDC), amana, 6186477231, initialQty);
         collectorContract.swap(amana, type(uint256).max);
 
-        (uint256 endQty, , , ) = collectorContract.assets(amana);
+        (uint256 endQty, , , , , ) = collectorContract.assets(amana);
         assertEq(endQty, 0);
     }
 
@@ -182,31 +182,31 @@ contract AaveV2CollectorContractConsolidationTest is Test {
 
     function testGetAmountInInvalidToken() public {
         vm.expectRevert(AaveV2CollectorContractConsolidation.UnsupportedToken.selector);
-        collectorContract.getAmountIn(WETH, 1e18, 18);
+        collectorContract.getAmountIn(WETH, 1e18);
     }
 
     function testGetAmountInNotEnoughTokens() public {
         address arai = collectorContract.ARAI();
-        (uint256 amountOut, , , ) = collectorContract.assets(arai);
+        (uint256 amountOut, , , , , ) = collectorContract.assets(arai);
 
         vm.expectRevert(AaveV2CollectorContractConsolidation.NotEnoughTokens.selector);
 
-        collectorContract.getAmountIn(arai, amountOut + 1, 18);
+        collectorContract.getAmountIn(arai, amountOut + 1);
     }
 
     function testGetAmountInAllBUSD() public {
-        // Get out max amount of BUSD from contract (339.910000 in USD terms)
-        uint256 amountOut = 2**256 - 1;
-        uint256 result = collectorContract.getAmountIn(collectorContract.BUSD(), amountOut, 18);
+        // Get out max amount of BUSD from contract (339910000 in USDC terms)
+        uint256 amountOut = 2 ** 256 - 1;
+        uint256 result = collectorContract.getAmountIn(collectorContract.BUSD(), amountOut);
         // BUSD to USDC should be close to 1:1 in price, thus result should be very close, minus discount
         assertEq(result, 337321068);
     }
 
     function testGetAmountInAllaSUSDWithETHBasedFeed() public {
-        // Get out max amount of aSUSD from contract (11,483.0000000 in USD terms)
-        uint256 amountOut = 2**256 - 1;
-        uint256 result = collectorContract.getAmountIn(collectorContract.ASUSD(), amountOut, 18);
-        // aSUSD to USDC should be close to 1:1 in price, thus result should be very close, minus discount
+        // Get out max amount of BUSD from contract (339910000 in USDC terms)
+        uint256 amountOut = 2 ** 256 - 1;
+        uint256 result = collectorContract.getAmountIn(collectorContract.ASUSD(), amountOut);
+        // BUSD to USDC should be close to 1:1 in price, thus result should be very close, minus discount
         assertEq(result, 11477301463);
     }
 
@@ -220,25 +220,21 @@ contract AaveV2CollectorContractConsolidationTest is Test {
     function testGetOraclePrice() public {
         uint256 expectedPrice = 1356316336;
 
-        (, , address oracle, ) = collectorContract.assets(collectorContract.AENS());
+        (, , address oracle, , , ) = collectorContract.assets(collectorContract.AENS());
         AggregatorV3Interface feed = AggregatorV3Interface(oracle);
         (, int256 price, , , ) = feed.latestRoundData();
         assertEq(uint256(price), expectedPrice);
-        (uint256 oraclePrice, ) = collectorContract.getOraclePrice(oracle);
+        uint256 oraclePrice = collectorContract.getOraclePrice(oracle);
         assertEq(oraclePrice, expectedPrice);
     }
 
     function testInvalidPriceFromOracleFuzz(int256 price) public {
         vm.assume(price <= int256(0));
 
-        (, , address oracle, ) = collectorContract.assets(collectorContract.ARAI());
+        (, , address oracle, , , ) = collectorContract.assets(collectorContract.ARAI());
         AggregatorV3Interface feed = AggregatorV3Interface(oracle);
 
-        vm.mockCall(
-            address(oracle),
-            abi.encodeWithSelector(feed.latestRoundData.selector),
-            abi.encode(uint80(10), price, uint256(2), uint256(3), uint80(10))
-        );
+        vm.mockCall(address(oracle), abi.encodeWithSelector(feed.latestAnswer.selector), abi.encode(price));
 
         vm.expectRevert(AaveV2CollectorContractConsolidation.InvalidOracleAnswer.selector);
         collectorContract.getOraclePrice(oracle);
