@@ -61,7 +61,7 @@ contract AaveV2CollectorContractConsolidation {
 
     constructor() {
         assets[ARAI] = Asset(
-            6740239e16,
+            ERC20(ARAI).balanceOf(AaveV2Ethereum.COLLECTOR),
             100,
             0x483d36F6a1d063d580c7a24F9A42B346f3a69fbb,
             ERC20(ARAI).decimals(),
@@ -69,7 +69,7 @@ contract AaveV2CollectorContractConsolidation {
             false
         );
         assets[AAMPL] = Asset(
-            15891248e7,
+            ERC20(AAMPL).balanceOf(AaveV2Ethereum.COLLECTOR),
             300,
             0xe20CA8D7546932360e37E9D72c1a47334af57706,
             ERC20(AAMPL).decimals(),
@@ -77,16 +77,23 @@ contract AaveV2CollectorContractConsolidation {
             false
         );
         assets[ADPI] = Asset(
-            1359e16,
+            ERC20(ADPI).balanceOf(AaveV2Ethereum.COLLECTOR),
             300,
             0xD2A593BF7594aCE1faD597adb697b5645d5edDB2,
             ERC20(ADPI).decimals(),
             8,
             false
         );
-        assets[SUSD] = Asset(9040e16, 75, 0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757, ERC20(SUSD).decimals(), 18, true);
+        assets[SUSD] = Asset(
+            ERC20(SUSD).balanceOf(AaveV2Ethereum.COLLECTOR),
+            75,
+            0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757,
+            ERC20(SUSD).decimals(),
+            18,
+            true
+        );
         assets[ASUSD] = Asset(
-            1148320e16,
+            ERC20(ASUSD).balanceOf(AaveV2Ethereum.COLLECTOR),
             75,
             0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757,
             ERC20(ASUSD).decimals(),
@@ -94,7 +101,7 @@ contract AaveV2CollectorContractConsolidation {
             true
         );
         assets[AFRAX] = Asset(
-            2869022e16,
+            ERC20(AFRAX).balanceOf(AaveV2Ethereum.COLLECTOR),
             75,
             0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD,
             ERC20(AFRAX).decimals(),
@@ -102,7 +109,7 @@ contract AaveV2CollectorContractConsolidation {
             false
         );
         assets[FRAX] = Asset(
-            1512479102e11,
+            ERC20(FRAX).balanceOf(AaveV2Ethereum.COLLECTOR),
             75,
             0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD,
             ERC20(FRAX).decimals(),
@@ -110,7 +117,7 @@ contract AaveV2CollectorContractConsolidation {
             false
         );
         assets[TUSD] = Asset(
-            160409e16,
+            ERC20(TUSD).balanceOf(AaveV2Ethereum.COLLECTOR),
             75,
             0xec746eCF986E2927Abd291a2A1716c940100f8Ba,
             ERC20(TUSD).decimals(),
@@ -118,7 +125,7 @@ contract AaveV2CollectorContractConsolidation {
             false
         );
         assets[ATUSD] = Asset(
-            608004e16,
+            ERC20(ATUSD).balanceOf(AaveV2Ethereum.COLLECTOR),
             75,
             0xec746eCF986E2927Abd291a2A1716c940100f8Ba,
             ERC20(ATUSD).decimals(),
@@ -126,7 +133,7 @@ contract AaveV2CollectorContractConsolidation {
             false
         );
         assets[AMANA] = Asset(
-            1622740e16,
+            ERC20(AMANA).balanceOf(AaveV2Ethereum.COLLECTOR),
             200,
             0x56a4857acbcfe3a66965c251628B1c9f1c408C19,
             ERC20(AMANA).decimals(),
@@ -134,7 +141,7 @@ contract AaveV2CollectorContractConsolidation {
             false
         );
         assets[MANA] = Asset(
-            33110e16,
+            ERC20(MANA).balanceOf(AaveV2Ethereum.COLLECTOR),
             200,
             0x56a4857acbcfe3a66965c251628B1c9f1c408C19,
             ERC20(MANA).decimals(),
@@ -142,7 +149,7 @@ contract AaveV2CollectorContractConsolidation {
             false
         );
         assets[ABUSD] = Asset(
-            364085e16,
+            ERC20(ABUSD).balanceOf(AaveV2Ethereum.COLLECTOR),
             75,
             0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A,
             ERC20(ABUSD).decimals(),
@@ -150,16 +157,23 @@ contract AaveV2CollectorContractConsolidation {
             false
         );
         assets[BUSD] = Asset(
-            3399064e14,
+            ERC20(BUSD).balanceOf(AaveV2Ethereum.COLLECTOR),
             75,
             0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A,
             ERC20(BUSD).decimals(),
             8,
             false
         );
-        assets[ZRX] = Asset(10719e16, 300, 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023, ERC20(ZRX).decimals(), 8, false);
+        assets[ZRX] = Asset(
+            ERC20(ZRX).balanceOf(AaveV2Ethereum.COLLECTOR),
+            300,
+            0x2885d15b8Af22648b98B122b22FDF4D2a56c6023,
+            ERC20(ZRX).decimals(),
+            8,
+            false
+        );
         assets[AZRX] = Asset(
-            877140e16,
+            ERC20(AZRX).balanceOf(AaveV2Ethereum.COLLECTOR),
             300,
             0x2885d15b8Af22648b98B122b22FDF4D2a56c6023,
             ERC20(AZRX).decimals(),
@@ -167,7 +181,7 @@ contract AaveV2CollectorContractConsolidation {
             false
         );
         assets[AENS] = Asset(
-            7047e16,
+            ERC20(AENS).balanceOf(AaveV2Ethereum.COLLECTOR),
             300,
             0x5C00128d4d1c2F4f652C267d7bcdD7aC99C16E16,
             ERC20(AENS).decimals(),
@@ -175,7 +189,7 @@ contract AaveV2CollectorContractConsolidation {
             false
         );
         assets[AUST] = Asset(
-            89239797e4,
+            ERC20(AUST).balanceOf(AaveV2Ethereum.COLLECTOR),
             200,
             0xa20623070413d42a5C01Db2c8111640DD7A5A03a,
             ERC20(AUST).decimals(),
@@ -230,9 +244,8 @@ contract AaveV2CollectorContractConsolidation {
         }
 
         // Basis points arbitrage incentive
-        amountIn =
-            (((_amountOut * oraclePrice) / 10**exponent) * (10000 - asset.premium)) / // Amount in before discount
-            10000;
+        amountIn = (((_amountOut * oraclePrice) / 10**exponent) // Amount before discount
+            * 10000) / (10000 + asset.premium);
     }
 
     /// @return The oracle price

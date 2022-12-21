@@ -7,8 +7,11 @@ import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
 import {AaveV2CollectorContractConsolidation} from "../AaveV2CollectorContractConsolidation.sol";
 import {AggregatorV3Interface} from "../external/AggregatorV3Interface.sol";
 import {ERC20} from "@openzeppelin/token/ERC20/ERC20.sol";
+import {SafeERC20} from "@openzeppelin/token/ERC20/utils/SafeERC20.sol";
 
 contract AaveV2CollectorContractConsolidationTest is Test {
+    using SafeERC20 for ERC20;
+
     event Swap(address indexed tokenIn, address indexed tokenOut, uint256 amountIn, uint256 amountOut);
 
     address public constant USDC_WHALE = 0x55FE002aefF02F77364de339a1292923A15844B8;
@@ -56,29 +59,9 @@ contract AaveV2CollectorContractConsolidationTest is Test {
     }
 
     function testSwapTooManyTokens() public {
+        (uint256 initialQty, , , , , ) = collectorContract.assets(collectorContract.ARAI());
         vm.expectRevert(AaveV2CollectorContractConsolidation.NotEnoughTokens.selector);
-        collectorContract.swap(allTokens[0], 500_00e18);
-    }
-
-    function testSwapAllMana() public {
-        address mana = collectorContract.MANA();
-        (uint256 initialQty, , , , , ) = collectorContract.assets(mana);
-
-        vm.prank(AaveV2Ethereum.COLLECTOR);
-        ERC20(mana).approve(address(collectorContract), 100_000e18);
-        vm.stopPrank();
-
-        vm.prank(USDC_WHALE);
-        USDC.approve(address(collectorContract), 100_000e18);
-        vm.stopPrank();
-
-        vm.prank(USDC_WHALE);
-        vm.expectEmit(true, true, false, true);
-        emit Swap(address(USDC), mana, 6186477231, initialQty);
-        collectorContract.swap(mana, type(uint256).max);
-
-        (uint256 endQty, , , , , ) = collectorContract.assets(mana);
-        assertEq(endQty, 0);
+        collectorContract.swap(allTokens[0], initialQty + 1);
     }
 
     function testSwapAmountOfTokensOut() public {
@@ -87,10 +70,10 @@ contract AaveV2CollectorContractConsolidationTest is Test {
         vm.stopPrank();
 
         uint256 length = allTokens.length;
-        uint256 amountToWithdraw = 1e18;
         for (uint256 i = 0; i < length; i++) {
             address token = allTokens[i];
             (uint256 initialQty, , , , , ) = collectorContract.assets(token);
+            uint256 amountToWithdraw = (initialQty * 100) / 200;
 
             vm.prank(AaveV2Ethereum.COLLECTOR);
             ERC20(token).approve(address(collectorContract), initialQty);
@@ -98,7 +81,7 @@ contract AaveV2CollectorContractConsolidationTest is Test {
 
             vm.prank(USDC_WHALE);
             collectorContract.swap(token, amountToWithdraw);
-            console.log(ERC20(token).name());
+            console.log(ERC20(token).allowance(AaveV2Ethereum.COLLECTOR, address(collectorContract)));
             console.log(token);
 
             (uint256 endQty, , , , , ) = collectorContract.assets(token);
@@ -120,10 +103,10 @@ contract AaveV2CollectorContractConsolidationTest is Test {
             ERC20(token).approve(address(collectorContract), initialQty);
             vm.stopPrank();
 
-            vm.prank(USDC_WHALE);
-            collectorContract.swap(token, type(uint256).max);
             console.log(ERC20(token).name());
             console.log(token);
+            vm.prank(USDC_WHALE);
+            collectorContract.swap(token, type(uint256).max);
 
             (uint256 endQty, , , , , ) = collectorContract.assets(token);
             assertEq(endQty, 0);
@@ -149,7 +132,7 @@ contract AaveV2CollectorContractConsolidationTest is Test {
         uint256 amountOut = 2**256 - 1;
         uint256 result = collectorContract.getAmountIn(collectorContract.BUSD(), amountOut);
         // BUSD to USDC should be close to 1:1 in price, thus result should be very close, minus discount
-        assertEq(result, 337317495);
+        assertEq(result, 337336478);
     }
 
     function testGetAmountInAllaSUSDWithETHBasedFeed() public {
@@ -157,7 +140,7 @@ contract AaveV2CollectorContractConsolidationTest is Test {
         uint256 amountOut = 2**256 - 1;
         uint256 result = collectorContract.getAmountIn(collectorContract.ASUSD(), amountOut);
         // aUSD to USDC should be close to 1:1 in price, thus result should be very close, minus discount
-        assertEq(result, 11477301463);
+        assertEq(result, 11872754069);
     }
 
     function testSendEthToContractFails() public {
@@ -184,7 +167,11 @@ contract AaveV2CollectorContractConsolidationTest is Test {
         (, , address oracle, , , ) = collectorContract.assets(collectorContract.ARAI());
         AggregatorV3Interface feed = AggregatorV3Interface(oracle);
 
-        vm.mockCall(address(oracle), abi.encodeWithSelector(feed.latestRoundData.selector), abi.encode(price));
+        vm.mockCall(
+            address(oracle),
+            abi.encodeWithSelector(feed.latestRoundData.selector),
+            abi.encode(uint80(10), price, uint256(2), uint256(3), uint80(10))
+        );
 
         vm.expectRevert(AaveV2CollectorContractConsolidation.InvalidOracleAnswer.selector);
         collectorContract.getOraclePrice(oracle);
