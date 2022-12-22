@@ -9,6 +9,7 @@ import "@forge-std/console.sol";
 import {GovHelpers} from "@aave-helpers/GovHelpers.sol";
 import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
 import {AaveAddressBookV2} from "@aave-address-book/AaveAddressBook.sol";
+import {AaveV2EthereumAMM} from "@aave-address-book/AaveV2EthereumAMM.sol";
 import {AaveV2CollectorContractConsolidation} from "../AaveV2CollectorContractConsolidation.sol";
 import {ProposalPayload} from "../ProposalPayload.sol";
 import {DeployMainnetProposal} from "../../script/DeployMainnetProposal.s.sol";
@@ -26,6 +27,16 @@ contract ProposalPayloadE2ETest is Test {
         payload = new ProposalPayload(consolidationContract);
     }
 
+    function testTheTest() public {
+        address DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
+        address AMMDAI = 0x79bE75FFC64DD58e66787E4Eae470c8a1FD08ba4;
+        uint256 amount = IERC20(AMMDAI).balanceOf(AaveV2Ethereum.COLLECTOR);
+        console.log(amount);
+        AaveV2EthereumAMM.POOL.withdraw(DAI, amount, AaveV2Ethereum.COLLECTOR);
+        uint256 endAmount = IERC20(DAI).balanceOf(AaveV2Ethereum.COLLECTOR);
+        assertEq(endAmount, 0);
+    }
+
     function testAllowanceOfToken() public {
         address arai = consolidationContract.ARAI();
 
@@ -38,9 +49,7 @@ contract ProposalPayloadE2ETest is Test {
     }
 
     function _passProposal() internal {
-        // 1. Deploy new payload
-
-        // 2. create proposal
+        // 1. create proposal
         vm.startPrank(GovHelpers.AAVE_WHALE);
         uint256 proposalId = DeployMainnetProposal._deployMainnetProposal(
             address(payload),
@@ -48,7 +57,7 @@ contract ProposalPayloadE2ETest is Test {
         );
         vm.stopPrank();
 
-        // 3. Execute proposal
+        // 2. Execute proposal
         GovHelpers.passVoteAndExecute(vm, proposalId);
     }
 }

@@ -4,6 +4,7 @@ pragma solidity ^0.8.15;
 import {AaveV2CollectorContractConsolidation} from "./AaveV2CollectorContractConsolidation.sol";
 import {IAaveEcosystemReserveController} from "./external/aave/IAaveEcosystemReserveController.sol";
 import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
+import {AaveV2EthereumAMM} from "@aave-address-book/AaveV2EthereumAMM.sol";
 import {IERC20} from "@openzeppelin/token/ERC20/IERC20.sol";
 
 /**
@@ -36,6 +37,12 @@ contract ProposalPayload {
 
     constructor(AaveV2CollectorContractConsolidation _consolidationContract) {
         consolidationContract = _consolidationContract;
+    }
+
+    function test() external {
+        address AMMDAI = 0x79bE75FFC64DD58e66787E4Eae470c8a1FD08ba4;
+        uint256 amount = IERC20(AMMDAI).balanceOf(AaveV2Ethereum.COLLECTOR);
+        AaveV2EthereumAMM.POOL.withdraw(AMMDAI, amount, AaveV2Ethereum.COLLECTOR);
     }
 
     /// @notice The AAVE governance executor calls this function to implement the proposal.

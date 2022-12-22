@@ -5,7 +5,6 @@ import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
 import {AggregatorV3Interface} from "./external/AggregatorV3Interface.sol";
 import {ERC20} from "@openzeppelin/token/ERC20/ERC20.sol";
 import {SafeERC20} from "@openzeppelin/token/ERC20/utils/SafeERC20.sol";
-import "@forge-std/console.sol";
 
 /// @title AaveV2CollectorContractConsolidation
 /// @author Llama
