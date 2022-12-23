@@ -28,7 +28,7 @@ contract AMMWithdrawer {
     function redeem() external {
         uint256 length = ammTokens.length;
 
-        for (uint256 i = 0; i < length;) {
+        for (uint256 i = 0; i < length; ) {
             address token = ammTokens[i];
             uint256 amount = IERC20(token).balanceOf(AaveV2Ethereum.COLLECTOR);
 

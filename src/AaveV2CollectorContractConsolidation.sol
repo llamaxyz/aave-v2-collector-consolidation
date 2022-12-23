@@ -243,8 +243,9 @@ contract AaveV2CollectorContractConsolidation {
         }
 
         // Basis points arbitrage incentive
-        amountIn = (((_amountOut * oraclePrice) / 10**exponent) // Amount before discount
-            * 10000) / (10000 + asset.premium);
+        amountIn =
+            (((_amountOut * oraclePrice) / 10**exponent) * 10000) / // Amount before discount
+            (10000 + asset.premium);
     }
 
     /// @return The oracle price
