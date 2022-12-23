@@ -5,6 +5,59 @@ https://governance.aave.com/t/arfc-ethereum-v2-collector-contract-consolidation/
 
 # Specification
 
+The proposal does the following, separated in two parts:
+
+ - Asset Withdrawal -
+
+Withdraws AMM tokens in the following markets:
+
+DAI
+USDC
+USDT
+WBTC
+WETH
+
+Converts it from the AMM version to the regular token.
+
+It does so in
+
+```
+AMMWithdrawer.sol
+
+function redeem() external {}
+```
+
+- Asset Consolidation -
+
+The asset consolidation portion of this payload lets users exchange their USDC for some of the long-tail assets available in the Aave V2 Collector Contract. The assets are the following:
+
+    ARAI
+    AAMPL
+    AFRAX
+    FRAX
+    AUST
+    SUSD
+    ASUSD
+    TUSD
+    ATUSD
+    AMANA
+    MANA
+    ABUSD
+    BUSD
+    ZRX
+    AZRX
+    AENS
+    ADPI
+
+```
+AaveV2CollectorContractConsolidation.sol
+
+function swap(address _token, uint256 _amountOut) external {}
+```
+
+This function lets the user specify which token they want to get out and how much they want to get out and will then use the sender's USDC to do so.
+(Needs to approve the contract to spend USDC first)
+
 ## Installation
 
 It requires [Foundry](https://github.com/gakonst/foundry) installed to run. You can find instructions here [Foundry installation](https://github.com/gakonst/foundry#installation).
