@@ -2,6 +2,7 @@
 pragma solidity ^0.8.15;
 
 import {AaveV2CollectorContractConsolidation} from "./AaveV2CollectorContractConsolidation.sol";
+import {AMMWithdrawer} from "./AMMWithdrawer.sol";
 import {IAaveEcosystemReserveController} from "./external/aave/IAaveEcosystemReserveController.sol";
 import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
 import {AaveV2EthereumAMM} from "@aave-address-book/AaveV2EthereumAMM.sol";
@@ -33,20 +34,58 @@ contract ProposalPayload {
     address public constant AENS = 0x9a14e23A58edf4EFDcB360f68cd1b95ce2081a2F;
     address public constant ADPI = 0x6F634c6135D2EBD550000ac92F494F9CB8183dAe;
 
+    // AMM Tokens
+
+    address public constant AMMDAI = 0x79bE75FFC64DD58e66787E4Eae470c8a1FD08ba4;
+    address public constant AMMUSDC = 0xd24946147829DEaA935bE2aD85A3291dbf109c80;
+    address public constant AMMUSDT = 0x17a79792Fe6fE5C95dFE95Fe3fCEE3CAf4fE4Cb7;
+    address public constant AMMWBTC = 0x13B2f6928D7204328b0E8E4BCd0379aA06EA21FA;
+    address public constant AMMWETH = 0xf9Fb4AD91812b704Ba883B11d2B576E890a6730A;
+
     AaveV2CollectorContractConsolidation public immutable consolidationContract;
+    AMMWithdrawer public immutable withdrawContract;
 
-    constructor(AaveV2CollectorContractConsolidation _consolidationContract) {
+    constructor(AaveV2CollectorContractConsolidation _consolidationContract, AMMWithdrawer _withdrawContract) {
         consolidationContract = _consolidationContract;
-    }
-
-    function test() external {
-        address AMMDAI = 0x79bE75FFC64DD58e66787E4Eae470c8a1FD08ba4;
-        uint256 amount = IERC20(AMMDAI).balanceOf(AaveV2Ethereum.COLLECTOR);
-        AaveV2EthereumAMM.POOL.withdraw(AMMDAI, amount, AaveV2Ethereum.COLLECTOR);
+        withdrawContract = _withdrawContract;
     }
 
     /// @notice The AAVE governance executor calls this function to implement the proposal.
     function execute() external {
+        // Approve withdraw contract to spend pre-defined amount of tokens and then redeem AMM Tokens
+        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+            AaveV2Ethereum.COLLECTOR,
+            AMMDAI,
+            address(withdrawContract),
+            type(uint256).max
+        );
+        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+            AaveV2Ethereum.COLLECTOR,
+            AMMUSDC,
+            address(withdrawContract),
+            type(uint256).max
+        );
+        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+            AaveV2Ethereum.COLLECTOR,
+            AMMUSDT,
+            address(withdrawContract),
+            type(uint256).max
+        );
+        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+            AaveV2Ethereum.COLLECTOR,
+            AMMWBTC,
+            address(withdrawContract),
+            type(uint256).max
+        );
+        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+            AaveV2Ethereum.COLLECTOR,
+            AMMWETH,
+            address(withdrawContract),
+            type(uint256).max
+        );
+
+        withdrawContract.redeem();
+
         // Approve the Consolidation Contract to spend pre-defined amount of tokens from AAVE V2 Collector
         IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
             AaveV2Ethereum.COLLECTOR,
