@@ -1,6 +1,9 @@
-# AAVE Governance Forge Template
+# AAVE V2 Collector Contract Consolidation
 
-A template for creating AAVE governance Proposal payload contracts.
+This repository contains the payload to consolidate long-tail assets in the collector into USDC, as well as redeeming AMM tokens per this proposal:
+https://governance.aave.com/t/arfc-ethereum-v2-collector-contract-consolidation/10909
+
+# Specification
 
 ## Installation
 

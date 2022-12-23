@@ -24,6 +24,7 @@ contract AMMWithdrawer {
     address[5] private ammTokens = [AMMDAI, AMMUSDC, AMMUSDT, AMMWBTC, AMMWETH];
     address[5] private tokens = [DAI, USDC, USDT, WBTC, WETH];
 
+    /// Withdraw AMM tokens from Aave V2 Collector Contract
     function redeem() external {
         uint256 length = ammTokens.length;
 
