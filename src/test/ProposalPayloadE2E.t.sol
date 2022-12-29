@@ -97,10 +97,10 @@ contract ProposalPayloadE2ETest is Test {
         uint256 length = aAmmTokens.length;
         for (uint256 i = 0; i < length; ++i) {
             uint256 ammBalanceOfCollector = IERC20(aAmmTokens[i]).balanceOf(AaveV2Ethereum.COLLECTOR);
-            uint256 finalUnderlyingBalance = balancesBefore[i] + ammBalancesBefore[i] - ammBalanceOfCollector;
+            uint256 finalUnderlyingBalance = balancesBefore[i] + ammBalancesBefore[i];
             // The withdrawal conversion is not 1 to 1 so might not be able to redeem to 0
             assertApproxEqAbs(ammBalanceOfCollector, 0, 4 ether);
-            assertApproxEqAbs(IERC20(tokens[i]).balanceOf(AaveV2Ethereum.COLLECTOR), finalUnderlyingBalance, 4 ether);
+            assertApproxEqAbs(IERC20(tokens[i]).balanceOf(AaveV2Ethereum.COLLECTOR), finalUnderlyingBalance, 1 ether);
             assertEq(IERC20(aAmmTokens[i]).balanceOf(address(withdrawContract)), 0);
         }
     }
