@@ -252,9 +252,7 @@ contract AaveV2CollectorContractConsolidation {
             => ie: amountIn = (amountTokenWei / 10^18) * (chainlinkPrice / 10^8) * 10^6
             =>     amountInWithDiscount = amountIn * 10000 / (10000 + 300) 
          */
-        amountIn =
-            (((_amountOut * oraclePrice) / 10**exponent) * 10000) / // Amount before discount
-            (10000 + asset.premium);
+        amountIn = (_amountOut * oraclePrice * 10000) / (10**exponent * (10000 + asset.premium));
     }
 
     /// @return The oracle price

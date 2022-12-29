@@ -90,7 +90,63 @@ contract ProposalPayloadE2ETest is Test {
         for (uint256 i = 0; i < lengthOne; ++i) {
             ammBalancesBefore[i] = IERC20(aAmmTokens[i]).balanceOf(AaveV2Ethereum.COLLECTOR);
             balancesBefore[i] = IERC20(tokens[i]).balanceOf(AaveV2Ethereum.COLLECTOR);
+
+            vm.expectCall(
+                address(AaveV2EthereumAMM.POOL),
+                abi.encodeCall(
+                    AaveV2EthereumAMM.POOL.withdraw,
+                    (tokens[i], type(uint256).max, AaveV2Ethereum.COLLECTOR)
+                )
+            );
         }
+
+        GovHelpers.passVoteAndExecute(vm, proposalId);
+
+        uint256 length = aAmmTokens.length;
+        for (uint256 i = 0; i < length; ++i) {
+            uint256 ammBalanceOfCollector = IERC20(aAmmTokens[i]).balanceOf(AaveV2Ethereum.COLLECTOR);
+            uint256 finalUnderlyingBalance = balancesBefore[i] + ammBalancesBefore[i];
+            // The withdrawal conversion is not 1 to 1 so might not be able to redeem to 0
+            assertApproxEqAbs(ammBalanceOfCollector, 0, 4 ether);
+            assertApproxEqAbs(IERC20(tokens[i]).balanceOf(AaveV2Ethereum.COLLECTOR), finalUnderlyingBalance, 1 ether);
+            assertEq(IERC20(aAmmTokens[i]).balanceOf(address(withdrawContract)), 0);
+        }
+    }
+
+    function testWithdrawOfAMMTokensOneTokenHasZeroQty() public {
+        uint256[] memory ammBalancesBefore = new uint256[](5);
+        uint256[] memory balancesBefore = new uint256[](5);
+        uint256 lengthOne = tokens.length;
+        for (uint256 i = 0; i < lengthOne; ++i) {
+            ammBalancesBefore[i] = IERC20(aAmmTokens[i]).balanceOf(AaveV2Ethereum.COLLECTOR);
+            balancesBefore[i] = IERC20(tokens[i]).balanceOf(AaveV2Ethereum.COLLECTOR);
+        }
+
+        vm.expectCall(
+            address(AaveV2EthereumAMM.POOL),
+            abi.encodeCall(AaveV2EthereumAMM.POOL.withdraw, (tokens[0], type(uint256).max, AaveV2Ethereum.COLLECTOR))
+        );
+
+        vm.expectCall(
+            address(AaveV2EthereumAMM.POOL),
+            abi.encodeCall(AaveV2EthereumAMM.POOL.withdraw, (tokens[1], type(uint256).max, AaveV2Ethereum.COLLECTOR))
+        );
+
+        vm.expectCall(
+            address(AaveV2EthereumAMM.POOL),
+            abi.encodeCall(AaveV2EthereumAMM.POOL.withdraw, (tokens[3], type(uint256).max, AaveV2Ethereum.COLLECTOR))
+        );
+
+        vm.expectCall(
+            address(AaveV2EthereumAMM.POOL),
+            abi.encodeCall(AaveV2EthereumAMM.POOL.withdraw, (tokens[4], type(uint256).max, AaveV2Ethereum.COLLECTOR))
+        );
+
+        vm.mockCall(
+            address(tokens[2]),
+            abi.encodeCall(IERC20(tokens[2]).balanceOf, (address(AaveV2Ethereum.COLLECTOR))),
+            abi.encode(uint256(0))
+        );
 
         GovHelpers.passVoteAndExecute(vm, proposalId);
 
@@ -203,7 +259,7 @@ contract ProposalPayloadE2ETest is Test {
         uint256 amountOut = 2**256 - 1;
         uint256 result = consolidationContract.getAmountIn(consolidationContract.BUSD(), amountOut);
         // BUSD to USDC should be close to 1:1 in price, thus result should be very close, minus discount
-        assertEq(result, 337336478);
+        assertEq(result, 337336479);
     }
 
     function testGetAmountInAllaSUSDWithETHBasedFeed() public {
@@ -211,7 +267,7 @@ contract ProposalPayloadE2ETest is Test {
         uint256 amountOut = 2**256 - 1;
         uint256 result = consolidationContract.getAmountIn(consolidationContract.ASUSD(), amountOut);
         // aUSD to USDC should be close to 1:1 in price, thus result should be very close, minus discount
-        assertEq(result, 11872754069);
+        assertEq(result, 11872754070);
     }
 
     function testSendEthToContractFails() public {
