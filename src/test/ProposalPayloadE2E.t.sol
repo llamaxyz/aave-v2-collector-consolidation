@@ -18,10 +18,13 @@ import {IERC20} from "@openzeppelin/token/ERC20/IERC20.sol";
 import {AggregatorV3Interface} from "../external/AggregatorV3Interface.sol";
 
 contract ProposalPayloadE2ETest is Test {
-    event Swap(address indexed tokenIn, address indexed tokenOut, uint256 amountIn, uint256 amountOut);
+    event Purchase(address indexed tokenIn, address indexed tokenOut, uint256 amountIn, uint256 amountOut);
 
     address public constant USDC_WHALE = 0x55FE002aefF02F77364de339a1292923A15844B8;
     address public constant ETH_WHALE = 0xF977814e90dA44bFA03b6295A0616a897441aceC;
+    address public constant BAL_WHALE = 0xF977814e90dA44bFA03b6295A0616a897441aceC;
+
+    IERC20 public constant BAL = IERC20(0xba100000625a3754423978a60c9317c58a424e3D);
 
     AaveV2CollectorContractConsolidation public collectorContract;
 
@@ -32,11 +35,11 @@ contract ProposalPayloadE2ETest is Test {
     ProposalPayload public payload;
     uint256 public proposalId;
 
-    address public constant AMMDAI = 0x79bE75FFC64DD58e66787E4Eae470c8a1FD08ba4;
-    address public constant AMMUSDC = 0xd24946147829DEaA935bE2aD85A3291dbf109c80;
-    address public constant AMMUSDT = 0x17a79792Fe6fE5C95dFE95Fe3fCEE3CAf4fE4Cb7;
-    address public constant AMMWBTC = 0x13B2f6928D7204328b0E8E4BCd0379aA06EA21FA;
-    address public constant AMMWETH = 0xf9Fb4AD91812b704Ba883B11d2B576E890a6730A;
+    address public constant aAMMDAI = 0x79bE75FFC64DD58e66787E4Eae470c8a1FD08ba4;
+    address public constant aAMMUSDC = 0xd24946147829DEaA935bE2aD85A3291dbf109c80;
+    address public constant aAMMUSDT = 0x17a79792Fe6fE5C95dFE95Fe3fCEE3CAf4fE4Cb7;
+    address public constant aAMMWBTC = 0x13B2f6928D7204328b0E8E4BCd0379aA06EA21FA;
+    address public constant aAMMWETH = 0xf9Fb4AD91812b704Ba883B11d2B576E890a6730A;
 
     address public constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
     address public constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -44,7 +47,7 @@ contract ProposalPayloadE2ETest is Test {
     address public constant WBTC = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
     address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
-    address[5] private ammTokens = [AMMDAI, AMMUSDC, AMMUSDT, AMMWBTC, AMMWETH];
+    address[5] private aAmmTokens = [aAMMDAI, aAMMUSDC, aAMMUSDT, aAMMWBTC, aAMMWETH];
     address[5] private tokens = [DAI, USDC, USDT, WBTC, WETH];
 
     function setUp() public {
@@ -81,49 +84,67 @@ contract ProposalPayloadE2ETest is Test {
     }
 
     function testWithdrawOfAMMTokens() public {
+        uint256[] memory ammBalancesBefore = new uint256[](5);
+        uint256[] memory balancesBefore = new uint256[](5);
+        uint256 lengthOne = tokens.length;
+        for (uint256 i = 0; i < lengthOne; ++i) {
+            ammBalancesBefore[i] = IERC20(aAmmTokens[i]).balanceOf(AaveV2Ethereum.COLLECTOR);
+            balancesBefore[i] = IERC20(tokens[i]).balanceOf(AaveV2Ethereum.COLLECTOR);
+        }
+
         GovHelpers.passVoteAndExecute(vm, proposalId);
 
-        uint256 length = ammTokens.length;
-        for (uint256 i = 0; i < length; i++) {
+        uint256 length = aAmmTokens.length;
+        for (uint256 i = 0; i < length; ++i) {
+            uint256 ammBalanceOfCollector = IERC20(aAmmTokens[i]).balanceOf(AaveV2Ethereum.COLLECTOR);
+            uint256 finalUnderlyingBalance = balancesBefore[i] + ammBalancesBefore[i] - ammBalanceOfCollector;
             // The withdrawal conversion is not 1 to 1 so might not be able to redeem to 0
-            assertApproxEqAbs(IERC20(ammTokens[i]).balanceOf(AaveV2Ethereum.COLLECTOR), 0, 4 ether);
+            assertApproxEqAbs(ammBalanceOfCollector, 0, 4 ether);
+            assertApproxEqAbs(IERC20(tokens[i]).balanceOf(AaveV2Ethereum.COLLECTOR), finalUnderlyingBalance, 4 ether);
+            assertEq(IERC20(aAmmTokens[i]).balanceOf(address(withdrawContract)), 0);
         }
     }
 
     function testAllowanceOfToken() public {
-        address arai = consolidationContract.ARAI();
-        assertEq(IERC20(arai).allowance(AaveV2Ethereum.COLLECTOR, address(consolidationContract)), 0);
+        uint256 length = allTokens.length;
+        for (uint256 i = 0; i < length; ++i) {
+            address token = allTokens[i];
+            assertEq(IERC20(token).allowance(AaveV2Ethereum.COLLECTOR, address(consolidationContract)), 0);
+        }
 
         GovHelpers.passVoteAndExecute(vm, proposalId);
 
-        (uint256 qty, , , , , ) = consolidationContract.assets(arai);
-        assertLe(qty, IERC20(arai).allowance(AaveV2Ethereum.COLLECTOR, address(consolidationContract)));
+        for (uint256 i = 0; i < length; ++i) {
+            address token = allTokens[i];
+            (uint256 qty, , , , , ) = consolidationContract.assets(token);
+            assertLe(qty, IERC20(token).allowance(AaveV2Ethereum.COLLECTOR, address(consolidationContract)));
+        }
     }
 
-    function testSwapZeroAmount() public {
+    function testPurchaseZeroAmount() public {
         GovHelpers.passVoteAndExecute(vm, proposalId);
 
         address frax = consolidationContract.FRAX();
         vm.expectRevert(AaveV2CollectorContractConsolidation.OnlyNonZeroAmount.selector);
-        consolidationContract.swap(frax, 0);
+        consolidationContract.purchase(frax, 0);
     }
 
-    function testSwapInvalidToken() public {
+    function testPurchaseInvalidToken() public {
         GovHelpers.passVoteAndExecute(vm, proposalId);
 
         vm.expectRevert(AaveV2CollectorContractConsolidation.UnsupportedToken.selector);
-        consolidationContract.swap(WETH, 1e18);
+        consolidationContract.purchase(WETH, 1e18);
     }
 
-    function testSwapTooManyTokens() public {
+    function testPurchaseTooManyTokens() public {
         GovHelpers.passVoteAndExecute(vm, proposalId);
 
         (uint256 initialQty, , , , , ) = consolidationContract.assets(consolidationContract.ARAI());
         vm.expectRevert(AaveV2CollectorContractConsolidation.NotEnoughTokens.selector);
-        consolidationContract.swap(allTokens[0], initialQty + 1);
+        consolidationContract.purchase(allTokens[0], initialQty + 1);
     }
 
-    function testSwapAmountOfTokensOut() public {
+    function testPurchaseAmountOfTokensOut() public {
         GovHelpers.passVoteAndExecute(vm, proposalId);
 
         vm.prank(USDC_WHALE);
@@ -137,14 +158,14 @@ contract ProposalPayloadE2ETest is Test {
             uint256 amountToWithdraw = (initialQty * 100) / 200;
 
             vm.prank(USDC_WHALE);
-            consolidationContract.swap(token, amountToWithdraw);
+            consolidationContract.purchase(token, amountToWithdraw);
 
             (uint256 endQty, , , , , ) = consolidationContract.assets(token);
             assertEq(endQty, initialQty - amountToWithdraw);
         }
     }
 
-    function testSwapAllTokensOut() public {
+    function testPurchaseAllTokensOut() public {
         GovHelpers.passVoteAndExecute(vm, proposalId);
 
         vm.prank(USDC_WHALE);
@@ -156,7 +177,7 @@ contract ProposalPayloadE2ETest is Test {
             address token = allTokens[i];
 
             vm.prank(USDC_WHALE);
-            consolidationContract.swap(token, type(uint256).max);
+            consolidationContract.purchase(token, type(uint256).max);
 
             (uint256 endQty, , , , , ) = consolidationContract.assets(token);
             assertEq(endQty, 0);
@@ -234,5 +255,35 @@ contract ProposalPayloadE2ETest is Test {
         consolidationContract.getOraclePrice(oracle);
 
         vm.clearMockedCalls();
+    }
+
+    function testRescueTokens() public {
+        assertEq(BAL.balanceOf(address(consolidationContract)), 0);
+        assertEq(IERC20(USDC).balanceOf(address(consolidationContract)), 0);
+
+        uint256 balAmount = 10_000e18;
+        uint256 usdcAmount = 10_000e6;
+
+        vm.prank(BAL_WHALE);
+        BAL.transfer(address(consolidationContract), balAmount);
+
+        vm.prank(USDC_WHALE);
+        IERC20(USDC).transfer(address(consolidationContract), usdcAmount);
+
+        assertEq(BAL.balanceOf(address(consolidationContract)), balAmount);
+        assertEq(IERC20(USDC).balanceOf(address(consolidationContract)), usdcAmount);
+
+        uint256 initialCollectorBalBalance = BAL.balanceOf(AaveV2Ethereum.COLLECTOR);
+        uint256 initialCollectorUsdcBalance = IERC20(USDC).balanceOf(AaveV2Ethereum.COLLECTOR);
+
+        address[] memory toRescue = new address[](2);
+        toRescue[0] = address(BAL);
+        toRescue[1] = address(USDC);
+        consolidationContract.rescueTokens(toRescue);
+
+        assertEq(BAL.balanceOf(AaveV2Ethereum.COLLECTOR), initialCollectorBalBalance + balAmount);
+        assertEq(IERC20(USDC).balanceOf(AaveV2Ethereum.COLLECTOR), initialCollectorUsdcBalance + usdcAmount);
+        assertEq(BAL.balanceOf(address(consolidationContract)), 0);
+        assertEq(IERC20(USDC).balanceOf(address(consolidationContract)), 0);
     }
 }

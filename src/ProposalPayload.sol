@@ -36,11 +36,11 @@ contract ProposalPayload {
 
     // AMM Tokens
 
-    address public constant AMMDAI = 0x79bE75FFC64DD58e66787E4Eae470c8a1FD08ba4;
-    address public constant AMMUSDC = 0xd24946147829DEaA935bE2aD85A3291dbf109c80;
-    address public constant AMMUSDT = 0x17a79792Fe6fE5C95dFE95Fe3fCEE3CAf4fE4Cb7;
-    address public constant AMMWBTC = 0x13B2f6928D7204328b0E8E4BCd0379aA06EA21FA;
-    address public constant AMMWETH = 0xf9Fb4AD91812b704Ba883B11d2B576E890a6730A;
+    address public constant aAMMDAI = 0x79bE75FFC64DD58e66787E4Eae470c8a1FD08ba4;
+    address public constant aAMMUSDC = 0xd24946147829DEaA935bE2aD85A3291dbf109c80;
+    address public constant aAMMUSDT = 0x17a79792Fe6fE5C95dFE95Fe3fCEE3CAf4fE4Cb7;
+    address public constant aAMMWBTC = 0x13B2f6928D7204328b0E8E4BCd0379aA06EA21FA;
+    address public constant aAMMWETH = 0xf9Fb4AD91812b704Ba883B11d2B576E890a6730A;
 
     AaveV2CollectorContractConsolidation public immutable consolidationContract;
     AMMWithdrawer public immutable withdrawContract;
@@ -55,31 +55,31 @@ contract ProposalPayload {
         // Approve withdraw contract to spend pre-defined amount of tokens and then redeem AMM Tokens
         IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
             AaveV2Ethereum.COLLECTOR,
-            AMMDAI,
+            aAMMDAI,
             address(withdrawContract),
             type(uint256).max
         );
         IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
             AaveV2Ethereum.COLLECTOR,
-            AMMUSDC,
+            aAMMUSDC,
             address(withdrawContract),
             type(uint256).max
         );
         IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
             AaveV2Ethereum.COLLECTOR,
-            AMMUSDT,
+            aAMMUSDT,
             address(withdrawContract),
             type(uint256).max
         );
         IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
             AaveV2Ethereum.COLLECTOR,
-            AMMWBTC,
+            aAMMWBTC,
             address(withdrawContract),
             type(uint256).max
         );
         IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
             AaveV2Ethereum.COLLECTOR,
-            AMMWETH,
+            aAMMWETH,
             address(withdrawContract),
             type(uint256).max
         );

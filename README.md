@@ -7,7 +7,7 @@ https://governance.aave.com/t/arfc-ethereum-v2-collector-contract-consolidation/
 
 The proposal does the following, separated in two parts:
 
- - Asset Withdrawal -
+- Asset Withdrawal -
 
 Withdraws AMM tokens in the following markets:
 
@@ -52,7 +52,7 @@ The asset consolidation portion of this payload lets users exchange their USDC f
 ```
 AaveV2CollectorContractConsolidation.sol
 
-function swap(address _token, uint256 _amountOut) external {}
+function purchase(address _token, uint256 _amountOut) external {}
 ```
 
 This function lets the user specify which token they want to get out and how much they want to get out and will then use the sender's USDC to do so.
