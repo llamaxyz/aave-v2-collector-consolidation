@@ -245,13 +245,15 @@ contract AaveV2CollectorContractConsolidation {
 
         // Basis points arbitrage incentive
         /** 
-            Amount In Calculation with 3% discount (300 basis points)
             The actual calculation is a collapsed version of this to prevent precision loss:
             => amountIn = (amountTokenWei / 10^tokenDecimals) * (chainlinkPrice / chainlinkPrecision) * 10^usdcDecimals
-            => amountInWithDiscount = amountIn * 10000 / (10000 + bps)
+            => amountInWithDiscount = amountIn * 10000 / (10000 + premium)
+
+            Example for asset with 18 decimals, chainlink precision of 8 decimals and 3% premium 
+            on asset being purchased (300 bps)
             => ie: amountIn = (amountTokenWei / 10^18) * (chainlinkPrice / 10^8) * 10^6
-            =>     amountInWithDiscount = amountIn * 10000 / (10000 + 300) 
-         */
+            =>      amountInWithDiscount = amountIn * 10000 / (10000 + 300)  
+        */
         amountIn = (_amountOut * oraclePrice * 10000) / (10**exponent * (10000 + asset.premium));
     }
 
