@@ -15,7 +15,7 @@ contract DeployProposalPayload is Script {
         AMMWithdrawer withdrawContract = new AMMWithdrawer();
         console.log("AMMWithdrawer address", address(withdrawContract));
 
-        ProposalPayload proposalPayload = new ProposalPayload(consolidationContract, withdrawContract);
+        ProposalPayload proposalPayload = new ProposalPayload(address(consolidationContract), withdrawContract);
         console.log("Proposal Payload address", address(proposalPayload));
         vm.stopBroadcast();
     }

@@ -58,6 +58,9 @@ function purchase(address _token, uint256 _amountOut) external {}
 This function lets the user specify which token they want to get out and how much they want to get out and will then use the sender's USDC to do so.
 (Needs to approve the contract to spend USDC first)
 
+Note: UST oracle no longer listed in the Chainlink site, but the contract can still be found [here](https://etherscan.io/address/0xa20623070413d42a5C01Db2c8111640DD7A5A03a).
+AAVE UST page can also be found [here](https://app.aave.com/reserve-overview/?underlyingAsset=0xa693b19d2931d498c5b318df961919bb4aee87a5&marketName=proto_mainnet)
+
 ## Installation
 
 It requires [Foundry](https://github.com/gakonst/foundry) installed to run. You can find instructions here [Foundry installation](https://github.com/gakonst/foundry#installation).
