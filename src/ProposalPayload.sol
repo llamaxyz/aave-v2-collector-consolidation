@@ -3,7 +3,7 @@ pragma solidity ^0.8.15;
 
 import {AaveV2CollectorContractConsolidation} from "./AaveV2CollectorContractConsolidation.sol";
 import {AMMWithdrawer} from "./AMMWithdrawer.sol";
-import {IAaveEcosystemReserveController} from "./external/aave/IAaveEcosystemReserveController.sol";
+import {AaveMisc} from "@aave-address-book/AaveMisc.sol";
 import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
 import {AaveV2EthereumAMM} from "@aave-address-book/AaveV2EthereumAMM.sol";
 import {IERC20} from "@openzeppelin/token/ERC20/IERC20.sol";
@@ -53,31 +53,31 @@ contract ProposalPayload {
     /// @notice The AAVE governance executor calls this function to implement the proposal.
     function execute() external {
         // Transfer to withdraw contract to spend pre-defined amount of tokens and then redeem AMM Tokens
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).transfer(
+        AaveMisc.AAVE_ECOSYSTEM_RESERVE_CONTROLLER.transfer(
             AaveV2Ethereum.COLLECTOR,
             aAMMDAI,
             address(withdrawContract),
             IERC20(aAMMDAI).balanceOf(AaveV2Ethereum.COLLECTOR)
         );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).transfer(
+        AaveMisc.AAVE_ECOSYSTEM_RESERVE_CONTROLLER.transfer(
             AaveV2Ethereum.COLLECTOR,
             aAMMUSDC,
             address(withdrawContract),
             IERC20(aAMMUSDC).balanceOf(AaveV2Ethereum.COLLECTOR)
         );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).transfer(
+        AaveMisc.AAVE_ECOSYSTEM_RESERVE_CONTROLLER.transfer(
             AaveV2Ethereum.COLLECTOR,
             aAMMUSDT,
             address(withdrawContract),
             IERC20(aAMMUSDT).balanceOf(AaveV2Ethereum.COLLECTOR)
         );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).transfer(
+        AaveMisc.AAVE_ECOSYSTEM_RESERVE_CONTROLLER.transfer(
             AaveV2Ethereum.COLLECTOR,
             aAMMWBTC,
             address(withdrawContract),
             IERC20(aAMMWBTC).balanceOf(AaveV2Ethereum.COLLECTOR)
         );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).transfer(
+        AaveMisc.AAVE_ECOSYSTEM_RESERVE_CONTROLLER.transfer(
             AaveV2Ethereum.COLLECTOR,
             aAMMWETH,
             address(withdrawContract),
