@@ -52,142 +52,142 @@ contract ProposalPayload {
 
     /// @notice The AAVE governance executor calls this function to implement the proposal.
     function execute() external {
-        // Approve withdraw contract to spend pre-defined amount of tokens and then redeem AMM Tokens
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        // Transfer to withdraw contract to spend pre-defined amount of tokens and then redeem AMM Tokens
+        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).transfer(
             AaveV2Ethereum.COLLECTOR,
             aAMMDAI,
             address(withdrawContract),
-            type(uint256).max
+            IERC20(aAMMDAI).balanceOf(AaveV2Ethereum.COLLECTOR)
         );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).transfer(
             AaveV2Ethereum.COLLECTOR,
             aAMMUSDC,
             address(withdrawContract),
-            type(uint256).max
+            IERC20(aAMMUSDC).balanceOf(AaveV2Ethereum.COLLECTOR)
         );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).transfer(
             AaveV2Ethereum.COLLECTOR,
             aAMMUSDT,
             address(withdrawContract),
-            type(uint256).max
+            IERC20(aAMMUSDT).balanceOf(AaveV2Ethereum.COLLECTOR)
         );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).transfer(
             AaveV2Ethereum.COLLECTOR,
             aAMMWBTC,
             address(withdrawContract),
-            type(uint256).max
+            IERC20(aAMMWBTC).balanceOf(AaveV2Ethereum.COLLECTOR)
         );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).transfer(
             AaveV2Ethereum.COLLECTOR,
             aAMMWETH,
             address(withdrawContract),
-            type(uint256).max
+            IERC20(aAMMWETH).balanceOf(AaveV2Ethereum.COLLECTOR)
         );
 
         withdrawContract.redeem();
 
         // Approve the Consolidation Contract to spend pre-defined amount of tokens from AAVE V2 Collector
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            ARAI,
-            address(consolidationContract),
-            IERC20(ARAI).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            AAMPL,
-            address(consolidationContract),
-            IERC20(AAMPL).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            AFRAX,
-            address(consolidationContract),
-            IERC20(AFRAX).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            FRAX,
-            address(consolidationContract),
-            IERC20(FRAX).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            AUST,
-            address(consolidationContract),
-            IERC20(AUST).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            SUSD,
-            address(consolidationContract),
-            IERC20(SUSD).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            ASUSD,
-            address(consolidationContract),
-            IERC20(ASUSD).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            TUSD,
-            address(consolidationContract),
-            IERC20(TUSD).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            ATUSD,
-            address(consolidationContract),
-            IERC20(ATUSD).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            AMANA,
-            address(consolidationContract),
-            IERC20(AMANA).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            MANA,
-            address(consolidationContract),
-            IERC20(MANA).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            ABUSD,
-            address(consolidationContract),
-            IERC20(ABUSD).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            BUSD,
-            address(consolidationContract),
-            IERC20(BUSD).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            ZRX,
-            address(consolidationContract),
-            IERC20(ZRX).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            AZRX,
-            address(consolidationContract),
-            IERC20(AZRX).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            AENS,
-            address(consolidationContract),
-            IERC20(AENS).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
-            AaveV2Ethereum.COLLECTOR,
-            ADPI,
-            address(consolidationContract),
-            IERC20(ADPI).balanceOf(AaveV2Ethereum.COLLECTOR)
-        );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     ARAI,
+        //     address(consolidationContract),
+        //     IERC20(ARAI).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     AAMPL,
+        //     address(consolidationContract),
+        //     IERC20(AAMPL).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     AFRAX,
+        //     address(consolidationContract),
+        //     IERC20(AFRAX).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     FRAX,
+        //     address(consolidationContract),
+        //     IERC20(FRAX).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     AUST,
+        //     address(consolidationContract),
+        //     IERC20(AUST).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     SUSD,
+        //     address(consolidationContract),
+        //     IERC20(SUSD).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     ASUSD,
+        //     address(consolidationContract),
+        //     IERC20(ASUSD).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     TUSD,
+        //     address(consolidationContract),
+        //     IERC20(TUSD).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     ATUSD,
+        //     address(consolidationContract),
+        //     IERC20(ATUSD).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     AMANA,
+        //     address(consolidationContract),
+        //     IERC20(AMANA).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     MANA,
+        //     address(consolidationContract),
+        //     IERC20(MANA).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     ABUSD,
+        //     address(consolidationContract),
+        //     IERC20(ABUSD).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     BUSD,
+        //     address(consolidationContract),
+        //     IERC20(BUSD).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     ZRX,
+        //     address(consolidationContract),
+        //     IERC20(ZRX).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     AZRX,
+        //     address(consolidationContract),
+        //     IERC20(AZRX).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     AENS,
+        //     address(consolidationContract),
+        //     IERC20(AENS).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
+        // IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).approve(
+        //     AaveV2Ethereum.COLLECTOR,
+        //     ADPI,
+        //     address(consolidationContract),
+        //     IERC20(ADPI).balanceOf(AaveV2Ethereum.COLLECTOR)
+        // );
     }
 }

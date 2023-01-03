@@ -5,7 +5,6 @@ import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
 import {AaveV2EthereumAMM} from "@aave-address-book/AaveV2EthereumAMM.sol";
 import {IERC20} from "@openzeppelin/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/token/ERC20/utils/SafeERC20.sol";
-import "@forge-std/console.sol";
 
 contract AMMWithdrawer {
     using SafeERC20 for IERC20;
@@ -31,13 +30,11 @@ contract AMMWithdrawer {
 
         for (uint256 i = 0; i < length; ) {
             address token = aAmmTokens[i];
-            uint256 amount = IERC20(token).balanceOf(AaveV2Ethereum.COLLECTOR);
+            uint256 amount = IERC20(token).balanceOf(address(this));
 
             if (amount == 0) {
                 continue;
             }
-
-            IERC20(token).safeTransferFrom(AaveV2Ethereum.COLLECTOR, address(this), amount);
 
             AaveV2EthereumAMM.POOL.withdraw(tokens[i], type(uint256).max, AaveV2Ethereum.COLLECTOR);
             unchecked {
