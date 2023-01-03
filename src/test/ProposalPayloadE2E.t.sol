@@ -8,7 +8,6 @@ import "@forge-std/console.sol";
 // contract dependencies
 import {GovHelpers} from "@aave-helpers/GovHelpers.sol";
 import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
-import {AaveAddressBookV2} from "@aave-address-book/AaveAddressBook.sol";
 import {AaveV2EthereumAMM} from "@aave-address-book/AaveV2EthereumAMM.sol";
 import {AaveV2CollectorContractConsolidation} from "../AaveV2CollectorContractConsolidation.sol";
 import {AMMWithdrawer} from "../AMMWithdrawer.sol";
