@@ -16,25 +16,7 @@ contract AaveV2CollectorContractConsolidation {
     uint256 public immutable USDC_DECIMALS;
     uint256 public immutable ETH_USD_ORACLE_DECIMALS;
 
-    address public constant ARAI = TokenAddresses.ARAI;
-    address public constant AAMPL = TokenAddresses.AAMPL;
-    address public constant AFRAX = TokenAddresses.AFRAX;
-    address public constant FRAX = TokenAddresses.FRAX;
-    address public constant AUST = TokenAddresses.AUST;
-    address public constant SUSD = TokenAddresses.SUSD;
-    address public constant ASUSD = TokenAddresses.ASUSD;
-    address public constant TUSD = TokenAddresses.TUSD;
-    address public constant ATUSD = TokenAddresses.ATUSD;
-    address public constant AMANA = TokenAddresses.AMANA;
-    address public constant MANA = TokenAddresses.MANA;
-    address public constant ABUSD = TokenAddresses.ABUSD;
-    address public constant BUSD = TokenAddresses.BUSD;
-    address public constant ZRX = TokenAddresses.ZRX;
-    address public constant AZRX = TokenAddresses.AZRX;
-    address public constant AENS = TokenAddresses.AENS;
-    address public constant ADPI = TokenAddresses.ADPI;
-
-    ERC20 public constant USDC = ERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
+    ERC20 public constant USDC = ERC20(TokenAddresses.USDC);
     address public constant ETH_USD_FEED = 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419;
 
     event Purchase(address indexed tokenIn, address indexed tokenOut, uint256 amountIn, uint256 amountOut);

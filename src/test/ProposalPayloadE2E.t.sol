@@ -43,30 +43,29 @@ contract ProposalPayloadE2ETest is Test {
         withdrawContract = new AMMWithdrawer();
         payload = new ProposalPayload(address(consolidationContract), withdrawContract);
 
-        allTokens[0] = consolidationContract.ARAI();
-        allTokens[1] = consolidationContract.AAMPL();
-        allTokens[2] = consolidationContract.AFRAX();
-        allTokens[3] = consolidationContract.FRAX();
-        allTokens[4] = consolidationContract.AENS();
-        allTokens[5] = consolidationContract.SUSD();
-        allTokens[6] = consolidationContract.ASUSD();
-        allTokens[7] = consolidationContract.TUSD();
-        allTokens[8] = consolidationContract.ATUSD();
-        allTokens[9] = consolidationContract.AMANA();
-        allTokens[10] = consolidationContract.ADPI();
-        allTokens[11] = consolidationContract.ABUSD();
-        allTokens[12] = consolidationContract.BUSD();
-        allTokens[13] = consolidationContract.ZRX();
-        allTokens[14] = consolidationContract.AZRX();
-        allTokens[15] = consolidationContract.AUST();
-        allTokens[16] = consolidationContract.MANA();
+        allTokens[0] = TokenAddresses.ARAI;
+        allTokens[1] = TokenAddresses.AAMPL;
+        allTokens[2] = TokenAddresses.AFRAX;
+        allTokens[3] = TokenAddresses.FRAX;
+        allTokens[4] = TokenAddresses.AENS;
+        allTokens[5] = TokenAddresses.SUSD;
+        allTokens[6] = TokenAddresses.ASUSD;
+        allTokens[7] = TokenAddresses.TUSD;
+        allTokens[8] = TokenAddresses.ATUSD;
+        allTokens[9] = TokenAddresses.AMANA;
+        allTokens[10] = TokenAddresses.ADPI;
+        allTokens[11] = TokenAddresses.ABUSD;
+        allTokens[12] = TokenAddresses.BUSD;
+        allTokens[13] = TokenAddresses.ZRX;
+        allTokens[14] = TokenAddresses.AZRX;
+        allTokens[15] = TokenAddresses.AUST;
+        allTokens[16] = TokenAddresses.MANA;
 
-        vm.startPrank(GovHelpers.AAVE_WHALE);
+        vm.prank(GovHelpers.AAVE_WHALE);
         proposalId = DeployMainnetProposal._deployMainnetProposal(
             address(payload),
             0x78ce0d63ca0c186ca3f58e712d3f1861ced3dad15ce3ad4f0e005d1663b49caf
         );
-        vm.stopPrank();
     }
 
     function testWithdrawOfAMMTokens() public {
@@ -122,6 +121,12 @@ contract ProposalPayloadE2ETest is Test {
     function testWithdrawOfAMMTokensOneTokenHasZeroQty() public {
         address[5] memory aAmmTokens = TokenAddresses.getaAMMTokens();
         address[5] memory tokens = TokenAddresses.getaAMMEquivalentTokens();
+
+        // Empty aAMMUSDT so that balance is zero on redeem()
+        vm.startPrank(AaveV2Ethereum.COLLECTOR);
+        IERC20(aAmmTokens[2]).transfer(BAL_WHALE, IERC20(aAmmTokens[2]).balanceOf(AaveV2Ethereum.COLLECTOR));
+        vm.stopPrank();
+
         uint256[] memory balancesBefore = new uint256[](5);
         uint256 lengthOne = tokens.length;
         for (uint256 i = 0; i < lengthOne; ++i) {
@@ -148,15 +153,7 @@ contract ProposalPayloadE2ETest is Test {
             abi.encodeCall(AaveV2EthereumAMM.POOL.withdraw, (tokens[4], type(uint256).max, AaveV2Ethereum.COLLECTOR))
         );
 
-        vm.mockCall(
-            address(tokens[2]),
-            abi.encodeCall(IERC20(aAmmTokens[2]).balanceOf, (address(AaveV2Ethereum.COLLECTOR))),
-            abi.encode(uint256(0))
-        );
-
-        console.log(IERC20(aAmmTokens[2]).balanceOf(AaveV2Ethereum.COLLECTOR));
         GovHelpers.passVoteAndExecute(vm, proposalId);
-        console.log(IERC20(aAmmTokens[2]).balanceOf(AaveV2Ethereum.COLLECTOR));
 
         // aAMMDAI
         assertEq(IERC20(aAmmTokens[0]).balanceOf(address(withdrawContract)), 0);
@@ -172,8 +169,9 @@ contract ProposalPayloadE2ETest is Test {
 
         // aAMMUSDT Should not be changed at all
         assertEq(IERC20(aAmmTokens[2]).balanceOf(address(withdrawContract)), 0);
-        assertEq(IERC20(aAmmTokens[2]).balanceOf(AaveV2Ethereum.COLLECTOR), 3899548);
-        assertEq(IERC20(tokens[2]).balanceOf(AaveV2Ethereum.COLLECTOR), 0);
+        assertEq(IERC20(aAmmTokens[2]).balanceOf(AaveV2Ethereum.COLLECTOR), 0);
+        assertEq(IERC20(tokens[2]).balanceOf(address(withdrawContract)), 0);
+        assertEq(IERC20(tokens[2]).balanceOf(AaveV2Ethereum.COLLECTOR), balancesBefore[2]);
 
         // aAMMWBTC
         assertEq(IERC20(aAmmTokens[3]).balanceOf(address(withdrawContract)), 0);
@@ -207,7 +205,7 @@ contract ProposalPayloadE2ETest is Test {
     function testPurchaseZeroAmount() public {
         GovHelpers.passVoteAndExecute(vm, proposalId);
 
-        address frax = consolidationContract.FRAX();
+        address frax = TokenAddresses.FRAX;
         vm.expectRevert(AaveV2CollectorContractConsolidation.OnlyNonZeroAmount.selector);
         consolidationContract.purchase(frax, 0);
     }
@@ -222,7 +220,7 @@ contract ProposalPayloadE2ETest is Test {
     function testPurchaseTooManyTokens() public {
         GovHelpers.passVoteAndExecute(vm, proposalId);
 
-        (uint256 initialQty, , , , , ) = consolidationContract.assets(consolidationContract.ARAI());
+        (uint256 initialQty, , , , , ) = consolidationContract.assets(TokenAddresses.ARAI);
         vm.expectRevert(
             abi.encodeWithSelector(AaveV2CollectorContractConsolidation.NotEnoughTokens.selector, initialQty)
         );
@@ -234,7 +232,6 @@ contract ProposalPayloadE2ETest is Test {
 
         vm.prank(USDC_WHALE);
         IERC20(USDC).approve(address(consolidationContract), type(uint256).max);
-        vm.stopPrank();
 
         uint256 length = allTokens.length;
         for (uint256 i = 0; i < length; i++) {
@@ -255,7 +252,6 @@ contract ProposalPayloadE2ETest is Test {
 
         vm.prank(USDC_WHALE);
         IERC20(USDC).approve(address(consolidationContract), type(uint256).max);
-        vm.stopPrank();
 
         uint256 length = allTokens.length;
         for (uint256 i = 0; i < length; i++) {
@@ -275,7 +271,7 @@ contract ProposalPayloadE2ETest is Test {
     }
 
     function testGetAmountInNotEnoughTokens() public {
-        address arai = consolidationContract.ARAI();
+        address arai = TokenAddresses.ARAI;
         (uint256 amountOut, , , , , ) = consolidationContract.assets(arai);
 
         vm.expectRevert(
@@ -288,7 +284,7 @@ contract ProposalPayloadE2ETest is Test {
     function testGetAmountInAllBUSD() public {
         // Get out max amount of BUSD from contract (339.910000 in USDC terms)
         uint256 amountOut = 2**256 - 1;
-        uint256 result = consolidationContract.getAmountIn(consolidationContract.BUSD(), amountOut);
+        uint256 result = consolidationContract.getAmountIn(TokenAddresses.BUSD, amountOut);
         // BUSD to USDC should be close to 1:1 in price, thus result should be very close, minus discount
         assertEq(result, 337336479);
     }
@@ -296,7 +292,7 @@ contract ProposalPayloadE2ETest is Test {
     function testGetAmountInAllaSUSDWithETHBasedFeed() public {
         // Get out max amount of aUSD from contract (11,483.0000000 in USDC terms)
         uint256 amountOut = 2**256 - 1;
-        uint256 result = consolidationContract.getAmountIn(consolidationContract.ASUSD(), amountOut);
+        uint256 result = consolidationContract.getAmountIn(TokenAddresses.ASUSD, amountOut);
         // aUSD to USDC should be close to 1:1 in price, thus result should be very close, minus discount
         assertEq(result, 11872754070);
     }
@@ -318,7 +314,7 @@ contract ProposalPayloadE2ETest is Test {
     function testGetOraclePrice() public {
         uint256 expectedPrice = 1356316336;
 
-        (, , address oracle, , , ) = consolidationContract.assets(consolidationContract.AENS());
+        (, , address oracle, , , ) = consolidationContract.assets(TokenAddresses.AENS);
         AggregatorV3Interface feed = AggregatorV3Interface(oracle);
         (, int256 price, , , ) = feed.latestRoundData();
         assertEq(uint256(price), expectedPrice);
@@ -329,7 +325,7 @@ contract ProposalPayloadE2ETest is Test {
     function testInvalidPriceFromOracleFuzz(int256 price) public {
         vm.assume(price <= int256(0));
 
-        (, , address oracle, , , ) = consolidationContract.assets(consolidationContract.ARAI());
+        (, , address oracle, , , ) = consolidationContract.assets(TokenAddresses.ARAI);
         AggregatorV3Interface feed = AggregatorV3Interface(oracle);
 
         vm.mockCall(
