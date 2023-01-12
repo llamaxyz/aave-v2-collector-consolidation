@@ -45,137 +45,137 @@ contract AaveV2CollectorContractConsolidation {
         assets[TokenAddresses.ARAI] = Asset(
             ERC20(TokenAddresses.ARAI).balanceOf(AaveV2Ethereum.COLLECTOR),
             100,
-            0x483d36F6a1d063d580c7a24F9A42B346f3a69fbb,
+            TokenAddresses.RAI_ORACLE,
             ERC20(TokenAddresses.ARAI).decimals(),
-            AggregatorV3Interface(0x483d36F6a1d063d580c7a24F9A42B346f3a69fbb).decimals(),
+            AggregatorV3Interface(TokenAddresses.RAI_ORACLE).decimals(),
             false
         );
         assets[TokenAddresses.AAMPL] = Asset(
             ERC20(TokenAddresses.AAMPL).balanceOf(AaveV2Ethereum.COLLECTOR),
             300,
-            0xe20CA8D7546932360e37E9D72c1a47334af57706,
+            TokenAddresses.AAMPL_ORACLE,
             ERC20(TokenAddresses.AAMPL).decimals(),
-            AggregatorV3Interface(0xe20CA8D7546932360e37E9D72c1a47334af57706).decimals(),
+            AggregatorV3Interface(TokenAddresses.AAMPL_ORACLE).decimals(),
             false
         );
         assets[TokenAddresses.ADPI] = Asset(
             ERC20(TokenAddresses.ADPI).balanceOf(AaveV2Ethereum.COLLECTOR),
             300,
-            0xD2A593BF7594aCE1faD597adb697b5645d5edDB2,
+            TokenAddresses.ADPI_ORACLE,
             ERC20(TokenAddresses.ADPI).decimals(),
-            AggregatorV3Interface(0xD2A593BF7594aCE1faD597adb697b5645d5edDB2).decimals(),
+            AggregatorV3Interface(TokenAddresses.ADPI_ORACLE).decimals(),
             false
         );
         assets[TokenAddresses.SUSD] = Asset(
             ERC20(TokenAddresses.SUSD).balanceOf(AaveV2Ethereum.COLLECTOR),
             75,
-            0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757,
+            TokenAddresses.SUSD_ORACLE,
             ERC20(TokenAddresses.SUSD).decimals(),
-            AggregatorV3Interface(0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757).decimals(),
+            AggregatorV3Interface(TokenAddresses.SUSD_ORACLE).decimals(),
             true
         );
         assets[TokenAddresses.ASUSD] = Asset(
             ERC20(TokenAddresses.ASUSD).balanceOf(AaveV2Ethereum.COLLECTOR),
             75,
-            0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757,
+            TokenAddresses.SUSD_ORACLE,
             ERC20(TokenAddresses.ASUSD).decimals(),
-            AggregatorV3Interface(0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757).decimals(),
+            AggregatorV3Interface(TokenAddresses.SUSD_ORACLE).decimals(),
             true
         );
         assets[TokenAddresses.AFRAX] = Asset(
             ERC20(TokenAddresses.AFRAX).balanceOf(AaveV2Ethereum.COLLECTOR),
             75,
-            0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD,
+            TokenAddresses.FRAX_ORACLE,
             ERC20(TokenAddresses.AFRAX).decimals(),
-            AggregatorV3Interface(0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD).decimals(),
+            AggregatorV3Interface(TokenAddresses.FRAX_ORACLE).decimals(),
             false
         );
         assets[TokenAddresses.FRAX] = Asset(
             ERC20(TokenAddresses.FRAX).balanceOf(AaveV2Ethereum.COLLECTOR),
             75,
-            0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD,
+            TokenAddresses.FRAX_ORACLE,
             ERC20(TokenAddresses.FRAX).decimals(),
-            AggregatorV3Interface(0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD).decimals(),
+            AggregatorV3Interface(TokenAddresses.FRAX_ORACLE).decimals(),
             false
         );
         assets[TokenAddresses.TUSD] = Asset(
             ERC20(TokenAddresses.TUSD).balanceOf(AaveV2Ethereum.COLLECTOR),
             75,
-            0xec746eCF986E2927Abd291a2A1716c940100f8Ba,
+            TokenAddresses.TUSD_ORACLE,
             ERC20(TokenAddresses.TUSD).decimals(),
-            AggregatorV3Interface(0xec746eCF986E2927Abd291a2A1716c940100f8Ba).decimals(),
+            AggregatorV3Interface(TokenAddresses.TUSD_ORACLE).decimals(),
             false
         );
         assets[TokenAddresses.ATUSD] = Asset(
             ERC20(TokenAddresses.ATUSD).balanceOf(AaveV2Ethereum.COLLECTOR),
             75,
-            0xec746eCF986E2927Abd291a2A1716c940100f8Ba,
+            TokenAddresses.TUSD_ORACLE,
             ERC20(TokenAddresses.ATUSD).decimals(),
-            AggregatorV3Interface(0xec746eCF986E2927Abd291a2A1716c940100f8Ba).decimals(),
+            AggregatorV3Interface(TokenAddresses.TUSD_ORACLE).decimals(),
             false
         );
         assets[TokenAddresses.AMANA] = Asset(
             ERC20(TokenAddresses.AMANA).balanceOf(AaveV2Ethereum.COLLECTOR),
             200,
-            0x56a4857acbcfe3a66965c251628B1c9f1c408C19,
+            TokenAddresses.MANA_ORACLE,
             ERC20(TokenAddresses.AMANA).decimals(),
-            AggregatorV3Interface(0x56a4857acbcfe3a66965c251628B1c9f1c408C19).decimals(),
+            AggregatorV3Interface(TokenAddresses.MANA_ORACLE).decimals(),
             false
         );
         assets[TokenAddresses.MANA] = Asset(
             ERC20(TokenAddresses.MANA).balanceOf(AaveV2Ethereum.COLLECTOR),
             200,
-            0x56a4857acbcfe3a66965c251628B1c9f1c408C19,
+            TokenAddresses.MANA_ORACLE,
             ERC20(TokenAddresses.MANA).decimals(),
-            AggregatorV3Interface(0x56a4857acbcfe3a66965c251628B1c9f1c408C19).decimals(),
+            AggregatorV3Interface(TokenAddresses.MANA_ORACLE).decimals(),
             false
         );
         assets[TokenAddresses.ABUSD] = Asset(
             ERC20(TokenAddresses.ABUSD).balanceOf(AaveV2Ethereum.COLLECTOR),
             75,
-            0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A,
+            TokenAddresses.BUSD_ORACLE,
             ERC20(TokenAddresses.ABUSD).decimals(),
-            AggregatorV3Interface(0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A).decimals(),
+            AggregatorV3Interface(TokenAddresses.BUSD_ORACLE).decimals(),
             false
         );
         assets[TokenAddresses.BUSD] = Asset(
             ERC20(TokenAddresses.BUSD).balanceOf(AaveV2Ethereum.COLLECTOR),
             75,
-            0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A,
+            TokenAddresses.BUSD_ORACLE,
             ERC20(TokenAddresses.BUSD).decimals(),
-            AggregatorV3Interface(0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A).decimals(),
+            AggregatorV3Interface(TokenAddresses.BUSD_ORACLE).decimals(),
             false
         );
         assets[TokenAddresses.ZRX] = Asset(
             ERC20(TokenAddresses.ZRX).balanceOf(AaveV2Ethereum.COLLECTOR),
             300,
-            0x2885d15b8Af22648b98B122b22FDF4D2a56c6023,
+            TokenAddresses.ZRX_ORACLE,
             ERC20(TokenAddresses.ZRX).decimals(),
-            AggregatorV3Interface(0x2885d15b8Af22648b98B122b22FDF4D2a56c6023).decimals(),
+            AggregatorV3Interface(TokenAddresses.ZRX_ORACLE).decimals(),
             false
         );
         assets[TokenAddresses.AZRX] = Asset(
             ERC20(TokenAddresses.AZRX).balanceOf(AaveV2Ethereum.COLLECTOR),
             300,
-            0x2885d15b8Af22648b98B122b22FDF4D2a56c6023,
+            TokenAddresses.ZRX_ORACLE,
             ERC20(TokenAddresses.AZRX).decimals(),
-            AggregatorV3Interface(0x2885d15b8Af22648b98B122b22FDF4D2a56c6023).decimals(),
+            AggregatorV3Interface(TokenAddresses.ZRX_ORACLE).decimals(),
             false
         );
         assets[TokenAddresses.AENS] = Asset(
             ERC20(TokenAddresses.AENS).balanceOf(AaveV2Ethereum.COLLECTOR),
             300,
-            0x5C00128d4d1c2F4f652C267d7bcdD7aC99C16E16,
+            TokenAddresses.ENS_ORACLE,
             ERC20(TokenAddresses.AENS).decimals(),
-            AggregatorV3Interface(0x5C00128d4d1c2F4f652C267d7bcdD7aC99C16E16).decimals(),
+            AggregatorV3Interface(TokenAddresses.ENS_ORACLE).decimals(),
             false
         );
         assets[TokenAddresses.AUST] = Asset(
             ERC20(TokenAddresses.AUST).balanceOf(AaveV2Ethereum.COLLECTOR),
             200,
-            0xa20623070413d42a5C01Db2c8111640DD7A5A03a,
+            TokenAddresses.UST_ORACLE,
             ERC20(TokenAddresses.AUST).decimals(),
-            AggregatorV3Interface(0xa20623070413d42a5C01Db2c8111640DD7A5A03a).decimals(),
+            AggregatorV3Interface(TokenAddresses.UST_ORACLE).decimals(),
             false
         );
 
@@ -242,7 +242,6 @@ contract AaveV2CollectorContractConsolidation {
             exponent += ETH_USD_ORACLE_DECIMALS;
         }
 
-        
         /** 
             Basis points arbitrage incentive
 

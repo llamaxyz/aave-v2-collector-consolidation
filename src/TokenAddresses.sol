@@ -38,11 +38,47 @@ library TokenAddresses {
     address public constant WBTC = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
     address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
+    // Oracle Addresses
+
+    address public constant RAI_ORACLE = 0x483d36F6a1d063d580c7a24F9A42B346f3a69fbb;
+    address public constant AAMPL_ORACLE = 0xe20CA8D7546932360e37E9D72c1a47334af57706;
+    address public constant ADPI_ORACLE = 0xD2A593BF7594aCE1faD597adb697b5645d5edDB2;
+    address public constant SUSD_ORACLE = 0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757;
+    address public constant FRAX_ORACLE = 0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD;
+    address public constant TUSD_ORACLE = 0xec746eCF986E2927Abd291a2A1716c940100f8Ba;
+    address public constant MANA_ORACLE = 0x56a4857acbcfe3a66965c251628B1c9f1c408C19;
+    address public constant BUSD_ORACLE = 0x833D8Eb16D306ed1FbB5D7A2E019e106B960965A;
+    address public constant ZRX_ORACLE = 0x2885d15b8Af22648b98B122b22FDF4D2a56c6023;
+    address public constant ENS_ORACLE = 0x5C00128d4d1c2F4f652C267d7bcdD7aC99C16E16;
+    address public constant UST_ORACLE = 0xa20623070413d42a5C01Db2c8111640DD7A5A03a;
+
     function getaAMMTokens() public pure returns (address[5] memory) {
         return [aAMMDAI, aAMMUSDC, aAMMUSDT, aAMMWBTC, aAMMWETH];
     }
 
     function getaAMMEquivalentTokens() public pure returns (address[5] memory) {
         return [DAI, USDC, USDT, WBTC, WETH];
+    }
+
+    function getPurchasableTokens() public pure returns (address[17] memory) {
+        return [
+            ARAI,
+            AAMPL,
+            AFRAX,
+            FRAX,
+            AUST,
+            SUSD,
+            ASUSD,
+            TUSD,
+            ATUSD,
+            AMANA,
+            MANA,
+            ABUSD,
+            BUSD,
+            ZRX,
+            AZRX,
+            AENS,
+            ADPI
+        ];
     }
 }
