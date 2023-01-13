@@ -1,6 +1,65 @@
-# AAVE Governance Forge Template
+# AAVE V2 Collector Contract Consolidation
 
-A template for creating AAVE governance Proposal payload contracts.
+This repository contains the payload to consolidate long-tail assets in the collector into USDC, as well as redeeming AMM tokens per this proposal:
+https://governance.aave.com/t/arfc-ethereum-v2-collector-contract-consolidation/10909
+
+# Specification
+
+The proposal does the following, separated in two parts:
+
+- Asset Withdrawal -
+
+Withdraws AMM tokens in the following markets:
+
+DAI
+USDC
+USDT
+WBTC
+WETH
+
+Converts it from the AMM version to the regular token.
+
+It does so in
+
+```
+AMMWithdrawer.sol
+
+function redeem() external {}
+```
+
+- Asset Consolidation -
+
+The asset consolidation portion of this payload lets users exchange their USDC for some of the long-tail assets available in the Aave V2 Collector Contract. The assets are the following:
+
+    ARAI
+    AAMPL
+    AFRAX
+    FRAX
+    AUST
+    SUSD
+    ASUSD
+    TUSD
+    ATUSD
+    AMANA
+    MANA
+    ABUSD
+    BUSD
+    ZRX
+    AZRX
+    AENS
+    ADPI
+
+```
+AaveV2CollectorContractConsolidation.sol
+
+function purchase(address _token, uint256 _amountOut) external {}
+```
+
+This function lets the user specify which token they want to get out and how much they want to get out and will then use the sender's USDC to do so.
+(Needs to approve the contract to spend USDC first)
+
+Note: UST oracle no longer listed in the Chainlink site, but the contract can still be found [here](https://etherscan.io/address/0xa20623070413d42a5C01Db2c8111640DD7A5A03a).
+AAVE UST page can also be found [here](https://app.aave.com/reserve-overview/?underlyingAsset=0xa693b19d2931d498c5b318df961919bb4aee87a5&marketName=proto_mainnet)
 
 ## Installation
 
